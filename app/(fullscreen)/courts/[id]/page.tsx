@@ -7,6 +7,7 @@ import DateSlider from "@/app/components/fragments/DateSlider";
 import ParalaxImage from "@/app/components/fragments/ParalaxImage";
 import { Slider } from "@/app/components/fragments/Slider";
 import TimeSlotPicker from "@/app/components/fragments/TimeSlotPicker";
+import { API_BASE_URL } from "@/app/utils/fetcher";
 import generateId from "@/app/utils/generateId";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -48,8 +49,8 @@ export default function Page() {
     async function fetchSheets() {
       try {
         const [resCourt, resBook] = await Promise.all([
-          fetch(`/api/sheets/courts/${id}`),
-          fetch(`/api/sheets/books/${id}`),
+          fetch(`${API_BASE_URL}/api/sheets/courts/${id}`),
+          fetch(`${API_BASE_URL}/api/sheets/books/${id}`),
         ]);
 
         const courtData = await resCourt.json();
