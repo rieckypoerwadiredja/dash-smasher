@@ -62,7 +62,9 @@ export default function TimeSlotPicker({
             form.start_time &&
             form.end_time &&
             time >= form.start_time &&
-            time < form.end_time;
+            time < form.end_time
+              ? true
+              : false;
 
           return (
             <Button
