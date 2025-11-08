@@ -6,20 +6,20 @@ import Link from "next/link";
 
 function Card({ court }: { court: Court }) {
   return (
-    <Link
-      href={`/courts/${court.id}`}
+    <div
       key={court.id}
       className="p-3 bg-white rounded-xl shadow-md transition-shadow duration-300"
     >
       {/* Image */}
-      <div className="relative w-full h-48 rounded-t-xl overflow-hidden">
-        <SkeletonImage
-          src={court.image}
-          alt={court.name}
-          className="cursor-pointer"
-        />
-      </div>
-
+      <Link href={`/courts/${court.id}`}>
+        <div className="relative w-full h-48 rounded-t-xl overflow-hidden">
+          <SkeletonImage
+            src={court.image}
+            alt={court.name}
+            className="cursor-pointer"
+          />
+        </div>
+      </Link>
       {/* Content */}
       <div className="flex items-center justify-between p-4">
         <div className="flex-1 flex-col pr-3">
@@ -41,7 +41,7 @@ function Card({ court }: { court: Court }) {
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
 
