@@ -1,20 +1,45 @@
-// app/page.tsx
-import EventsList, { EventItem } from "../components/fragments/EventsList";
-import RecentActivityList from "../components/fragments/RecentActivityList";
-import CourtCardList, { Court } from "../components/fragments/CourtCardList";
+"use client";
+
+import { useEffect, useState } from "react";
+import EventsList, {
+  EventItem,
+  EventsListSkeleton,
+} from "../components/fragments/EventsList";
+import RecentActivityList, {
+  RecentActivityListSkeleton,
+} from "../components/fragments/RecentActivityList";
+import CourtCardList, {
+  Court,
+  CourtCardListSkeleton,
+} from "../components/fragments/CourtCardList";
 import { API_BASE_URL, fetchData } from "../utils/fetcher";
 
-async function getEvents(): Promise<EventItem[]> {
-  return fetchData<EventItem[]>(`${API_BASE_URL}/api/sheets/events`);
-}
+export default function Home() {
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [courts, setCourts] = useState<Court[]>([]);
+  const [loading, setLoading] = useState(true);
 
-async function getCourts(): Promise<Court[]> {
-  return fetchData<Court[]>(`${API_BASE_URL}/api/sheets/courts`);
-}
+  useEffect(() => {
+    Promise.all([
+      fetchData<EventItem[]>(`${API_BASE_URL}/api/sheets/events`),
+      fetchData<Court[]>(`${API_BASE_URL}/api/sheets/courts`),
+    ])
+      .then(([eventsData, courtsData]) => {
+        setEvents(eventsData);
+        setCourts(courtsData);
+      })
+      .catch((err) => console.error("Failed to load data:", err))
+      .finally(() => setLoading(false));
+  }, []);
 
-export default async function Home() {
-  const events = await getEvents();
-  const courts = await getCourts();
+  if (loading)
+    return (
+      <>
+        <EventsListSkeleton />
+        <RecentActivityListSkeleton />
+        <CourtCardListSkeleton />
+      </>
+    );
 
   return (
     <>
