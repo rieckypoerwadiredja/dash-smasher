@@ -17,19 +17,14 @@ interface SliderImagesProps {
 export function SliderImages({ title = "Slider", images }: SliderImagesProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const [imageWidth, setImageWidth] = useState(
-    window.innerWidth >= 768 ? 250 : 150
-  );
+  const [imageWidth, setImageWidth] = useState(150);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (window.innerWidth >= 768) setImageWidth(250);
-
     const handleResize = () => {
-      if (window.innerWidth >= 768) setImageWidth(250);
-      else setImageWidth(150);
+      setImageWidth(window.innerWidth >= 768 ? 250 : 150);
     };
 
+    handleResize(); // set initial width
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -42,11 +37,12 @@ export function SliderImages({ title = "Slider", images }: SliderImagesProps) {
       behavior: "smooth",
     });
   };
-
   const scrollRight = () => {
-    scrollRef.current?.scrollBy({ left: imageWidth + gap, behavior: "smooth" });
+    scrollRef.current?.scrollBy({
+      left: imageWidth + gap,
+      behavior: "smooth",
+    });
   };
-
   const skeletons = Array.from({ length: 6 });
 
   return (
@@ -90,9 +86,9 @@ export function SliderImages({ title = "Slider", images }: SliderImagesProps) {
                 key={i}
                 src={item.image}
                 alt={item.name}
-                width={imageWidth}
+                // width={imageWidth}
                 aspectRatio={3 / 4}
-                className="cursor-pointer shrink-0"
+                className="cursor-pointer shrink-0 w-[150px] max-w-[150px] md:w-[250px] md:max-w-[250px] aspect-3/4"
               />
             ))}
       </div>
@@ -101,20 +97,6 @@ export function SliderImages({ title = "Slider", images }: SliderImagesProps) {
 }
 
 export function SliderSkeleton() {
-  const [imageWidth, setImageWidth] = useState(
-    window.innerWidth >= 768 ? 250 : 150
-  );
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) setImageWidth(250);
-      else setImageWidth(150);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
   const skeletons = Array.from({ length: 6 });
 
   return (
@@ -131,8 +113,7 @@ export function SliderSkeleton() {
         {skeletons.map((_, i) => (
           <div
             key={i}
-            style={{ width: imageWidth, height: (imageWidth * 4) / 3 }}
-            className="bg-gray-300 animate-pulse rounded-lg shrink-0"
+            className="bg-gray-300 animate-pulse rounded-lg shrink-0 w-[150px] md:w-[250px] aspect-3/4"
           />
         ))}
       </div>

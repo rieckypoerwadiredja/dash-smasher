@@ -2,10 +2,12 @@ import React from "react";
 import Button from "./Button";
 import SkeletonImage from "../fragments/SkeletonImage";
 import { Court } from "../fragments/CourtCardList";
+import Link from "next/link";
 
 function Card({ court }: { court: Court }) {
   return (
-    <div
+    <Link
+      href={`/courts/${court.id}`}
       key={court.id}
       className="p-3 bg-white rounded-xl shadow-md transition-shadow duration-300"
     >
@@ -39,7 +41,7 @@ function Card({ court }: { court: Court }) {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
