@@ -1,7 +1,7 @@
 // components/fragments/TimeSlotPicker.tsx
 import React from "react";
 import Button from "../elements/Button";
-import { Court } from "./CourtCardList";
+import { Court } from "@/app/(main)/courts/page";
 import { Book } from "@/app/(fullscreen)/courts/[id]/page";
 
 export interface TimeSlotPickerProps {

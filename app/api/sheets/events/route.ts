@@ -25,7 +25,7 @@ export async function GET() {
       );
     }
 
-    const range = "events!A:F";
+    const range = "events!A:I";
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId,
       range,

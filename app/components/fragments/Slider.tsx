@@ -3,15 +3,19 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import SkeletonImage from "./SkeletonImage";
+import ConditionalPopup from "../elements/conditionals/ConditionalPopup";
+import { PopupProps } from "./popup/CardPoup";
 
-interface ImageItem {
+export interface ImageItemProps {
+  id: string | number;
   name: string;
   image: string;
+  action_popup?: PopupProps;
 }
 
 interface SliderImagesProps {
   title?: string;
-  images: ImageItem[];
+  images: ImageItemProps[];
 }
 
 export function SliderImages({ title = "Slider", images }: SliderImagesProps) {
@@ -82,14 +86,19 @@ export function SliderImages({ title = "Slider", images }: SliderImagesProps) {
               ></div>
             ))
           : images.map((item, i) => (
-              <SkeletonImage
+              <ConditionalPopup
                 key={i}
-                src={item.image}
-                alt={item.name}
-                // width={imageWidth}
-                aspectRatio={3 / 4}
+                data={item.action_popup}
                 className="cursor-pointer shrink-0 w-[150px] max-w-[150px] md:w-[250px] md:max-w-[250px] aspect-3/4"
-              />
+              >
+                <SkeletonImage
+                  src={item.image}
+                  alt={item.name}
+                  // width={imageWidth}
+                  aspectRatio={3 / 4}
+                  className="cursor-pointer shrink-0 w-[150px] max-w-[150px] md:w-[250px] md:max-w-[250px] aspect-3/4"
+                />
+              </ConditionalPopup>
             ))}
       </div>
     </div>

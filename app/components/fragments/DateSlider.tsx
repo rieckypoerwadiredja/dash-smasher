@@ -33,12 +33,12 @@ export default function DateSlider({
           e.stopPropagation();
           openPicker();
         }}
-        className="bg-light-gray text-black hover:bg-primary hover:text-white transition-all duration-100 font-semibold rounded-2xl flex flex-col justify-between items-center shrink-0 p-5 aspect-square w-24"
+        className=" text-white bg-primary transition-all duration-100 font-semibold rounded-2xl flex flex-col justify-between items-center shrink-0 p-5 aspect-square w-32"
       >
-        <span className="font-semibold text-md">
-          {monthNames[currentMonth]}
+        <span className="flex font-semibold text-md">
+          {currentYear} {monthNames[currentMonth]}
         </span>
-        <FaCalendarDays className="text-3xl" />
+        <FaCalendarDays className="text-4xl" />
       </button>
 
       <input

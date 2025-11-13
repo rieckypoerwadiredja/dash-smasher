@@ -1,23 +1,28 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import CourtCardList, {
-  Court,
-  CourtCardListSkeleton,
-} from "@/app/components/fragments/CourtCardList";
+import CourtClientWrapper from "@/app/components/fragments/CourtClientWrapper";
+import Section from "@/app/components/fragments/Section";
 import { API_BASE_URL, fetchData } from "@/app/utils/fetcher";
+import { mapCourtToCardData } from "@/app/utils/mapers/courtMapers";
+export interface Court {
+  id: string;
+  name: string;
+  image: string;
+  desc: string;
+  location: string;
+  city: string;
+  open_time: string;
+  close_time: string;
+  open_day: string;
+  map_link: string;
+  court_count: number;
+  price_per_hour: number;
+}
+export default async function CourtsPage() {
+  const courts = await fetchData<Court[]>(`${API_BASE_URL}/api/sheets/courts`);
+  const cards = courts.map(mapCourtToCardData);
 
-export default function CourtsPage() {
-  const [courts, setCourts] = useState<Court[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchData<Court[]>(`${API_BASE_URL}/api/sheets/courts`)
-      .then((data) => setCourts(data))
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return <CourtCardListSkeleton />;
-
-  return <CourtCardList courts={courts} title="" filter />;
+  return (
+    <Section title="Avalaible Courts">
+      <CourtClientWrapper initialCards={cards} />
+    </Section>
+  );
 }

@@ -1,8 +1,8 @@
 import React from "react";
-import { CourtCardListSkeleton } from "@/app/components/fragments/CourtCardList";
+import { CardListSkeleton } from "@/app/components/fragments/CardList";
 
 function loading() {
-  return <CourtCardListSkeleton />;
+  return <CardListSkeleton filterCount={4} />;
 }
 
 export default loading;

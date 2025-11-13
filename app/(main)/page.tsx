@@ -1,56 +1,26 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import EventsList, {
-  EventItem,
-  EventsListSkeleton,
-} from "../components/fragments/EventsList";
-import RecentActivityList, {
-  RecentActivityListSkeleton,
-} from "../components/fragments/RecentActivityList";
-import CourtCardList, {
-  Court,
-  CourtCardListSkeleton,
-} from "../components/fragments/CourtCardList";
+import SliderImageContainer from "../components/fragments/SliderImageContainer";
+import RecentActivityList from "../components/fragments/RecentActivityList";
 import { API_BASE_URL, fetchData } from "../utils/fetcher";
+import { Event } from "./events/page";
+import CardList from "../components/fragments/CardList";
+import { Court } from "./courts/page";
+import { mapCourtToCardData } from "../utils/mapers/courtMapers";
+import { mapEventsToSliderData } from "../utils/mapers/eventMapers";
 
-export default function Home() {
-  const [events, setEvents] = useState<EventItem[]>([]);
-  const [courts, setCourts] = useState<Court[]>([]);
-  const [loading, setLoading] = useState(true);
+export default async function Home() {
+  const [events, courts] = await Promise.all([
+    fetchData<Event[]>(`${API_BASE_URL}/api/sheets/events`),
+    fetchData<Court[]>(`${API_BASE_URL}/api/sheets/courts`),
+  ]);
 
-  useEffect(() => {
-    Promise.all([
-      fetchData<EventItem[]>(`${API_BASE_URL}/api/sheets/events`),
-      fetchData<Court[]>(`${API_BASE_URL}/api/sheets/courts`),
-    ])
-      .then(([eventsData, courtsData]) => {
-        setEvents(eventsData);
-        setCourts(courtsData);
-      })
-      .catch((err) => console.error("Failed to load data:", err))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading)
-    return (
-      <>
-        <EventsListSkeleton />
-        <RecentActivityListSkeleton />
-        <CourtCardListSkeleton />
-      </>
-    );
+  const cards = courts.map(mapCourtToCardData);
+  const eventSliders = events.map(mapEventsToSliderData);
 
   return (
     <>
-      <EventsList events={events} />
+      <SliderImageContainer data={eventSliders} />
       <RecentActivityList />
-      <CourtCardList
-        title="Court Availability Status"
-        courts={courts}
-        filter
-        limit
-      />
+      <CardList title="Court Availability Status" cards={cards} limit />
     </>
   );
 }

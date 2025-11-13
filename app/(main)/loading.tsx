@@ -1,15 +1,15 @@
 "use client";
 
-import { EventsListSkeleton } from "../components/fragments/EventsList";
+import { SliderImageContainerSkeleton } from "../components/fragments/SliderImageContainer";
 import { RecentActivityListSkeleton } from "../components/fragments/RecentActivityList";
-import { CourtCardListSkeleton } from "../components/fragments/CourtCardList";
+import { CardListSkeleton } from "../components/fragments/CardList";
 
 export default function LoadingPage() {
   return (
     <>
-      <EventsListSkeleton />
+      <SliderImageContainerSkeleton />
       <RecentActivityListSkeleton />
-      <CourtCardListSkeleton />
+      <CardListSkeleton />
     </>
   );
 }

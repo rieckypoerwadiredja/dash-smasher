@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
+import { Court } from "@/app/(main)/courts/page";
 import BookingFooter from "@/app/components/fragments/BookingFooter";
-import { Court } from "@/app/components/fragments/CourtCardList";
+
 import DateSlider from "@/app/components/fragments/DateSlider";
 import ParalaxImage from "@/app/components/fragments/ParalaxImage";
 import { Slider } from "@/app/components/fragments/Slider";
@@ -131,16 +132,28 @@ export default function Page() {
 
   // Cek booked time setiap tanggal / court berubah
   useEffect(() => {
-    if (!form.date || !form.court_number) {
-      return;
-    }
+    if (!form.date || !form.court_number) return;
 
     const bookedForCourt = books
       .filter((b) => {
+        if (!b.date) return false;
+
+        //  "DD-MM-YYYY" → "YYYY-MM-DD"
+        const normalize = (d: string) => {
+          if (/^\d{2}-\d{2}-\d{4}$/.test(d)) {
+            const [dd, mm, yyyy] = d.split("-");
+            return `${yyyy}-${mm}-${dd}`;
+          }
+          return d;
+        };
+
+        const normalizedBookDate = normalize(b.date);
+        const normalizedFormDate = normalize(form.date);
+
         return (
           b.court_id === court?.id &&
           b.court_number === form.court_number &&
-          new Date(b.date).toISOString().split("T")[0] === form.date
+          normalizedBookDate === normalizedFormDate
         );
       })
       .map((b) => b.start_time.padStart(5, "0"));
@@ -243,7 +256,7 @@ export default function Page() {
     const bookingData = { ...form, id: idGen, court_id: court?.id || "" };
 
     try {
-      const res = await fetch("/api/sheets/books", {
+      const res = await fetch(`${API_BASE_URL}/api/sheets/books`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -274,6 +287,7 @@ export default function Page() {
 
       setTimeLabel("");
       setSelectedDate(null);
+      // window.location.reload();
     } catch (err) {
       console.error(err);
       alert("An error occurred while booking. Please try again.");

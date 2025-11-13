@@ -7,5 +7,5 @@ export async function fetchData<T>(url: string): Promise<T> {
       "There was a problem communicating with the server. Please try again later."
     );
   const data = await res.json();
-  return data.data || data;
+  return (data.data || data) as T;
 }

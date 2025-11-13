@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Section from "./Section";
 import CardGrid from "./CardGrid";
-import Info from "../elements/Info";
+import Info, { InfoSkeleton } from "../elements/Info";
 
 interface Activity {
   image: string;
@@ -100,17 +100,7 @@ export function RecentActivityListSkeleton() {
       {/* Grid skeleton cards */}
       <CardGrid>
         {skeletons.map((_, i) => (
-          <div
-            key={i}
-            className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200"
-          >
-            {/* Image placeholder */}
-            <div className="w-full h-40 bg-gray-300"></div>
-            <div className="p-3">
-              <div className="h-5 w-2/3 bg-gray-300 rounded mb-2"></div>
-              <div className="h-4 w-1/3 bg-gray-200 rounded"></div>
-            </div>
-          </div>
+          <InfoSkeleton key={i} />
         ))}
       </CardGrid>
 
