@@ -16,7 +16,9 @@ export interface Event {
   type: string;
 }
 export default async function PageEvent() {
-  const events = await fetchData<Event[]>(`${API_BASE_URL}/api/sheets/events`);
+  const events = await fetchData<Event[]>(`${API_BASE_URL}/api/sheets/events`, {
+    runtime: true,
+  });
   const cards: MainCardProps[] = events.map(mapEventToCardData);
 
   return (
