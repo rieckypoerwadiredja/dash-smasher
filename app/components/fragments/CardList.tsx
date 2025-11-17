@@ -3,12 +3,14 @@ import CardGrid from "./CardGrid";
 import Section from "./Section";
 import { CardSkeleton, MainCard, MainCardProps } from "../elements/Card";
 import { ReactNode } from "react";
+import StatusMessage, { StatusProps } from "./status/StatusMessage";
 
 interface CardListProps {
   title: string;
   cards: MainCardProps[];
   limit?: boolean;
   filterComponent?: ReactNode;
+  status: StatusProps;
 }
 
 export default function CardList({
@@ -16,16 +18,19 @@ export default function CardList({
   cards,
   limit = false,
   filterComponent,
+  status,
 }: CardListProps) {
   const visibleCourts = limit ? cards.slice(-6) : cards;
 
   return (
-    <Section title={title}>
+    <Section minScreen title={title}>
       {filterComponent && (
         <div className="flex flex-wrap items-center gap-3 mb-6 text-sm">
           {filterComponent}
         </div>
       )}
+
+      {visibleCourts.length === 0 && <StatusMessage data={status} />}
 
       <CardGrid className="gap-4 md:gap-8">
         {visibleCourts.map((card) => (

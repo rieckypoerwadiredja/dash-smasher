@@ -2,15 +2,8 @@ import type { Metadata } from "next";
 import Header from "../components/fragments/Header";
 import "../globals.css";
 import { NavMob } from "../components/fragments/Nav";
-import { DM_Sans } from "next/font/google";
 import Footer from "../components/fragments/Footer";
-
-const dmSans = DM_Sans({
-  subsets: ["latin", "latin-ext"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  variable: "--font-dm-sans",
-  display: "swap",
-});
+import SessionWrapper from "../components/elements/SessionWrapper";
 
 export const metadata: Metadata = {
   title: "Dash Smasher App",
@@ -28,13 +21,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <body className={`max-w-[1440px] mx-auto ${dmSans.className}`}>
+    <SessionWrapper>
       <div className="px-5 md:px-10">
         <Header />
         {children}
         <NavMob />
       </div>
-      <Footer />
-    </body>
+    </SessionWrapper>
   );
 }

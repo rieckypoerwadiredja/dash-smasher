@@ -11,6 +11,7 @@
   --color-black: #1f1b1b;
   --color-light-gray: #eeeeee;
   --color-dark-gray: #bec0c1;
+  --color-white: #ffffff;
 }
 
 .scrollbar-none::-webkit-scrollbar {
@@ -22,7 +23,7 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: "#f9f9f9";
   font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
 }

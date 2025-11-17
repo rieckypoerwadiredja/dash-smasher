@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { Court } from "@/app/(main)/courts/page";
@@ -10,7 +9,8 @@ import { Slider } from "@/app/components/fragments/Slider";
 import TimeSlotPicker from "@/app/components/fragments/TimeSlotPicker";
 import { API_BASE_URL } from "@/app/utils/fetcher";
 import generateId from "@/app/utils/generateId";
-import { useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 export interface Book {
@@ -18,6 +18,7 @@ export interface Book {
   court_id: string;
   court_number: string;
   user: string;
+  email: string;
   start_time: string;
   end_time: string;
   date: string;
@@ -26,6 +27,9 @@ export interface Book {
 
 export default function Page() {
   const params = useParams();
+  const router = useRouter();
+  const { data: session } = useSession();
+
   const id = params.id;
 
   const [court, setCourt] = useState<Court | null>(null);
@@ -35,6 +39,7 @@ export default function Page() {
     court_id: "",
     court_number: "",
     user: "",
+    email: "",
     start_time: "",
     end_time: "",
     date: "",
@@ -241,6 +246,12 @@ export default function Page() {
   // Validasi sebelum submit
   // Validasi dan submit booking
   const handleBookNow = async () => {
+    // cek login
+    if (!session?.user?.email) {
+      alert("Harap login terlebih dahulu sebelum booking!");
+      router.push("/login");
+      return;
+    }
     if (
       !form.user ||
       !form.court_number ||
@@ -253,7 +264,12 @@ export default function Page() {
     }
 
     const idGen = generateId();
-    const bookingData = { ...form, id: idGen, court_id: court?.id || "" };
+    const bookingData = {
+      ...form,
+      id: idGen,
+      court_id: court?.id || "",
+      email: session.user.email,
+    };
 
     try {
       const res = await fetch(`${API_BASE_URL}/api/sheets/books`, {
@@ -263,12 +279,15 @@ export default function Page() {
         },
         body: JSON.stringify(bookingData),
       });
-
-      if (!res.ok) {
-        throw new Error("Gagal melakukan booking. Silakan coba lagi.");
-      }
+      console.log(form);
 
       const data = await res.json();
+      console.log(data);
+      if (!res.ok) {
+        throw new Error(
+          data.error || "Gagal melakukan booking. Silakan coba lagi."
+        );
+      }
       console.log("Booking success:", data);
 
       alert("Booking success!");
@@ -279,6 +298,7 @@ export default function Page() {
         court_id: "",
         court_number: "",
         user: "",
+        email: "",
         start_time: "",
         end_time: "",
         date: "",
@@ -287,10 +307,15 @@ export default function Page() {
 
       setTimeLabel("");
       setSelectedDate(null);
-      // window.location.reload();
-    } catch (err) {
-      console.error(err);
-      alert("An error occurred while booking. Please try again.");
+      window.location.reload();
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(err.message);
+      } else if (typeof err === "object" && err !== null && "error" in err) {
+        alert((err as { error: string }).error);
+      } else {
+        alert("An unexpected error occurred");
+      }
     }
   };
 

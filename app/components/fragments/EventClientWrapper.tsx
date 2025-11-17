@@ -46,6 +46,11 @@ export default function EventClientWrapper({
     <CardList
       cards={filteredCards}
       title=""
+      status={{
+        title: "Oops, event not found",
+        desc: "Try other keywords",
+        status: "empty",
+      }}
       filterComponent={<FilterEvent onFilterChange={handleFilterChange} />}
     />
   );

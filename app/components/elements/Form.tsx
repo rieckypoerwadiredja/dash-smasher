@@ -3,6 +3,7 @@ interface SelectInputProps {
   value: string | number;
   options: { label: string; value: string | number }[];
   label: string;
+  className?: string;
 }
 interface GeneralInputProps {
   onChange: (
@@ -11,6 +12,7 @@ interface GeneralInputProps {
   value: string | number;
   placeholder?: string;
   type?: "text" | "number" | "email" | "password" | "date" | "time" | "search";
+  className?: string;
 }
 
 export function SelectInput({
@@ -18,12 +20,13 @@ export function SelectInput({
   value,
   options,
   label,
+  className,
 }: SelectInputProps) {
   return (
     <select
       value={value}
       onChange={onChange}
-      className="shadow font-medium cursor-pointer bg-white rounded-lg px-3 py-2 w-36"
+      className={`shadow font-medium cursor-pointer bg-white rounded-lg px-3 py-2 w-36 ${className}`}
     >
       <option value="">{label}</option>
       {options.map((opt, i) => (
@@ -39,6 +42,7 @@ export function GeneralInput({
   value,
   placeholder,
   type,
+  className,
 }: GeneralInputProps) {
   return (
     <input
@@ -46,7 +50,7 @@ export function GeneralInput({
       placeholder={placeholder}
       value={value}
       onChange={onChange}
-      className="shadow font-medium cursor-pointer bg-white rounded-lg px-3 py-2 w-28"
+      className={`shadow font-medium cursor-pointer bg-white rounded-lg px-3 py-2 w-28 ${className}`}
     />
   );
 }

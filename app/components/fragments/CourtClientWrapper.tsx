@@ -32,6 +32,11 @@ function CourtClientWrapper({ initialCards }: CourtClientWrapperProps) {
     <CardList
       title=""
       cards={filteredCards}
+      status={{
+        title: "Oops, court not found",
+        desc: "Try other keywords",
+        status: "empty",
+      }}
       filterComponent={
         <FilterCourt
           courts={initialCards}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import "../../../globals.css";
-import { NavMob } from "@/app/components/fragments/Nav";
+import "../globals.css";
+import Footer from "../components/fragments/Footer";
+import SessionWrapper from "../components/elements/SessionWrapper";
 
 export const metadata: Metadata = {
   title: "Dash Smasher App",
@@ -17,10 +18,5 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <>
-      {children}
-      <NavMob />
-    </>
-  );
+  return <SessionWrapper>{children}</SessionWrapper>;
 }

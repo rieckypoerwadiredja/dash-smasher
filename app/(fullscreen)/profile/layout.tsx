@@ -20,14 +20,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <body className={`max-w-[1440px] mx-auto`}>
+    <>
       <div className="px-5 md:px-10">
         <HeaderWithoutSearchBar />
 
         {children}
         <NavMob />
       </div>
-      <Footer />
-    </body>
+    </>
   );
 }

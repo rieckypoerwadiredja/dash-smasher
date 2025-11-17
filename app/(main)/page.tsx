@@ -20,7 +20,16 @@ export default async function Home() {
     <>
       <SliderImageContainer data={eventSliders} />
       <RecentActivityList />
-      <CardList title="Court Availability Status" cards={cards} limit />
+      <CardList
+        title="Court Availability Status"
+        cards={cards}
+        limit
+        status={{
+          title: "Oops, court avalaible",
+          desc: "Try again later",
+          status: "empty",
+        }}
+      />
     </>
   );
 }

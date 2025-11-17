@@ -22,3 +22,34 @@ export function CardDesc({
     ></p>
   );
 }
+
+export function Paragraph({
+  children,
+  className,
+}: {
+  children: string;
+  className?: string;
+}) {
+  return (
+    <p
+      className={`text-gray-500 text-sm ${className}`}
+      dangerouslySetInnerHTML={{ __html: children }}
+    ></p>
+  );
+}
+
+export function SectionTitle({
+  children,
+  className,
+}: {
+  children: string;
+  className?: string;
+}) {
+  return (
+    <h2
+      className={`text-2xl md:text-3xl text-black font-semibold mb-5 ${className}`}
+    >
+      {children}
+    </h2>
+  );
+}

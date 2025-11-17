@@ -1,13 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import { IoNotifications, IoSearch } from "react-icons/io5";
 import Link from "next/link";
 import SkeletonImage from "./SkeletonImage";
 import { NavDesktop } from "./Nav";
+import { signOut, useSession } from "next-auth/react";
+import Button from "../elements/Button";
 
 function Header() {
   const fullLogo = "/full-logo.png";
+  const session = useSession();
 
   return (
     <header className="w-full px-3">
@@ -32,10 +34,17 @@ function Header() {
           <Link href="/notification">
             <IoNotifications className="text-primary text-2xl" />
           </Link>
-          {/* Login Button (Desktop Only) */}
-          <button className="hidden md:inline-block bg-white text-orange-600 px-4 py-1 rounded-full font-semibold hover:bg-gray-100 transition">
-            Login
-          </button>
+
+          {session ? (
+            <button
+              onClick={() => signOut({ redirect: true, callbackUrl: "/login" })}
+              className="hidden md:inline-block bg-white text-orange-600 px-4 py-1 rounded-full font-semibold hover:bg-gray-100 transition"
+            >
+              Logout
+            </button>
+          ) : (
+            <Button link="/login">Login</Button>
+          )}
         </div>
       </div>
       <div className="relative">
@@ -56,6 +65,7 @@ function Header() {
 
 export function HeaderWithoutSearchBar() {
   const fullLogo = "/full-logo.png";
+  const session = useSession();
 
   return (
     <header className="w-full px-3">
@@ -81,9 +91,16 @@ export function HeaderWithoutSearchBar() {
             <IoNotifications className="text-primary text-2xl" />
           </Link>
           {/* Login Button (Desktop Only) */}
-          <button className="hidden md:inline-block bg-white text-orange-600 px-4 py-1 rounded-full font-semibold hover:bg-gray-100 transition">
-            Login
-          </button>
+          {session ? (
+            <button
+              onClick={() => signOut({ redirect: true, callbackUrl: "/login" })}
+              className="hidden md:inline-block bg-white text-orange-600 px-4 py-1 rounded-full font-semibold hover:bg-gray-100 transition"
+            >
+              Logout
+            </button>
+          ) : (
+            <Button link="/login">Login</Button>
+          )}
         </div>
       </div>
     </header>

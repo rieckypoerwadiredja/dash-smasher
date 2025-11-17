@@ -10,6 +10,7 @@ export async function POST(request: Request) {
       court_id,
       court_number,
       user,
+      email,
       start_time,
       end_time,
       date,
@@ -22,6 +23,7 @@ export async function POST(request: Request) {
       !court_id ||
       !court_number ||
       !user ||
+      !email ||
       !start_time ||
       !end_time ||
       !date ||
@@ -46,12 +48,22 @@ export async function POST(request: Request) {
 
     // Format data sesuai urutan kolom di sheet "books"
     const values = [
-      [id, court_id, court_number, user, start_time, end_time, date, status],
+      [
+        id,
+        court_id,
+        court_number,
+        user,
+        email,
+        start_time,
+        end_time,
+        date,
+        status,
+      ],
     ];
 
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: "books!A:H", // kolom sesuai urutan
+      range: "books!A:I", // kolom sesuai urutan
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values,
