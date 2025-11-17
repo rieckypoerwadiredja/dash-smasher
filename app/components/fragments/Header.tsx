@@ -9,7 +9,7 @@ import Button from "../elements/Button";
 
 function Header() {
   const fullLogo = "/full-logo.png";
-  const session = useSession();
+  const { data: session } = useSession();
 
   return (
     <header className="w-full px-3">
@@ -65,7 +65,7 @@ function Header() {
 
 export function HeaderWithoutSearchBar() {
   const fullLogo = "/full-logo.png";
-  const session = useSession();
+  const { data: session } = useSession();
 
   return (
     <header className="w-full px-3">
