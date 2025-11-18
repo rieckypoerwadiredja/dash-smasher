@@ -13,9 +13,7 @@ export default function ConditionalPopup({
   className,
 }: ConditionalPopupProps) {
   if (!data) {
-    return (
-      <div className={`cursor-default ${className || ""}`}>{children}</div>
-    );
+    return <>{children}</>;
   }
 
   return (

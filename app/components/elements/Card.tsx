@@ -27,12 +27,12 @@ export function CardSkeleton() {
 }
 
 export interface MainCardProps {
-  id: string | number;
+  id: string;
   image: string;
   name: string;
   desc: string;
-  action_link?: string;
-  action_name?: string;
+  action_link?: string | "disabled";
+  action_name?: string | "Already Registered";
   action_popup?: PopupProps;
   //
   rawStartTime?: string;
@@ -56,10 +56,10 @@ export function MainCard({ card }: { card: MainCardProps }) {
       className="p-3 bg-white rounded-xl shadow-md transition-shadow duration-300"
     >
       {/* Image */}
-      <ConditionalLink href={action_link}>
+      <ConditionalLink href={action_link} className="block h-48">
         <ConditionalPopup
           data={action_popup}
-          className="relative w-full h-48 rounded-t-xl overflow-hidden"
+          className="relative w-full h-48 rounded-t-xl overflow-hidden block"
         >
           <SkeletonImage src={image} alt={name} className="cursor-pointer" />
         </ConditionalPopup>
@@ -73,6 +73,10 @@ export function MainCard({ card }: { card: MainCardProps }) {
             <ConditionalPopup data={action_popup}>
               <Button
                 link={action_link}
+                disabled={
+                  action_link === "disabled" ||
+                  action_name === "Already Registered"
+                }
                 className="cursor-pointer px-3 py-1 text-sm"
               >
                 {action_name}

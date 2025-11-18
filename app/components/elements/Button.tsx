@@ -16,15 +16,22 @@ export default function Button({
   className,
   link,
   onClick,
+  disabled = false,
   primary = true,
 }: ButtonProps) {
-  const baseClass = `text-lg font-semibold ${
-    primary && "bg-primary hover:bg-primary/90 text-white"
-  }   px-3 py-1.5 rounded-lg  transition-colors whitespace-nowrap ${className}`;
+  const baseClass = `text-lg font-semibold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${className} `;
+
+  const primaryClass = primary
+    ? "bg-primary hover:bg-primary/90 text-white"
+    : "bg-gray-200 hover:bg-gray-300 text-gray-800";
+
+  const disabledClass = disabled
+    ? "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300"
+    : primaryClass;
 
   if (link) {
     return (
-      <Link href={link} className={baseClass}>
+      <Link href={link} className={`${baseClass} ${disabledClass}`}>
         {children}
       </Link>
     );
@@ -32,10 +39,10 @@ export default function Button({
 
   return (
     <button
-      disabled={false}
+      disabled={disabled}
       onClick={onClick}
       type="button"
-      className={baseClass}
+      className={`${baseClass} ${disabledClass}`}
     >
       {children}
     </button>

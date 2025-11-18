@@ -1,51 +1,42 @@
-import { Event } from "@/app/(main)/events/page";
+import { Event, EventMember } from "@/app/(main)/events/page";
 import { MainCardProps } from "@/app/components/elements/Card";
 import { PopupProps } from "@/app/components/fragments/popup/CardPoup";
 import { ImageItemProps } from "@/app/components/fragments/Slider";
 import { formatDateRange } from "../date";
 
-export const mapEventToCardData = (event: Event): MainCardProps => {
-  // Date format to (12 Nov 2025)
-  const startDateObj = new Date(event.start_date);
-  const endDateObj = new Date(event.end_date);
+export const mapEventToCardData = (
+  event: Event,
+  userEventData?: EventMember[] | undefined
+): MainCardProps => {
+  const userEventsArray = userEventData ? userEventData : [];
 
-  const formattedDateRange = formatDateRange(startDateObj, endDateObj);
+  let alreadyRegistered = false;
+  for (let i = 0; i < userEventsArray.length; i++) {
+    const userEvent = userEventsArray[i];
+    console.log("Checking userEvent:", userEvent);
+    if (userEvent.event_id === event.id) {
+      alreadyRegistered = true;
+      break;
+    }
+  }
 
-  // Merge Date
-  const formattedTime = `Date: ${formattedDateRange}`;
-
-  // short desc
-  const shortDesc =
-    event.desc && event.desc.length > 50
-      ? event.desc.slice(0, 50) + "..."
-      : event.desc;
-
-  //full desc
-  const fullDesc = `${event.desc || ""}\n\n${formattedTime}`;
-
-  const shortVersion = shortDesc
-    ? `${shortDesc}\n\n${formattedTime}`
-    : formattedTime;
-
+  console.log(event.id, userEventsArray);
   return {
     id: event.id,
     name: event.name,
     image: event.image,
-    desc: shortVersion,
-    action_name: "Register Now",
+    desc: event.desc?.slice(0, 50) || "",
+    action_name: alreadyRegistered ? "Already Registered" : "Register Now",
     action_popup: {
       image: event.image,
       title: event.name,
-      desc: fullDesc,
-      action_name: "Join Now",
+      desc: event.desc,
+      action_name: alreadyRegistered ? "Already Registered" : "Join Now",
       subTitle: {
-        date: formattedDateRange,
-        members: 210,
+        date: `${event.start_date} - ${event.end_date}`,
+        members: 200,
       },
     },
-    // Raw data
-    rawStartTime: event.start_time,
-    rawEndTime: event.end_time,
     rawStartDate: event.start_date,
     rawEndDate: event.end_date,
     rawType: event.type,

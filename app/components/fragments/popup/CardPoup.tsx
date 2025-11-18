@@ -16,6 +16,7 @@ export interface PopupProps {
   desc: string;
   action_name: string;
   subTitle?: subTitle | string;
+  action?: () => void | Promise<void>;
 }
 export interface CardPoupProps {
   children: ReactNode;
@@ -92,7 +93,12 @@ export default function CardPoup({ children, className, data }: CardPoupProps) {
               <CardDesc className="text-black!">{data.desc}</CardDesc>
             </div>
             <div className="flex gap-3 justify-start">
-              <Button>{data.action_name}</Button>
+              <Button
+                disabled={data.action_name === "Already Registered"}
+                onClick={data.action}
+              >
+                {data.action_name}
+              </Button>
             </div>
           </div>
         </div>

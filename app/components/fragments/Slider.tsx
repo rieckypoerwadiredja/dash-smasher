@@ -7,13 +7,13 @@ import ConditionalPopup from "../elements/conditionals/ConditionalPopup";
 import { PopupProps } from "./popup/CardPoup";
 
 export interface ImageItemProps {
-  id: string | number;
+  id: string;
   name: string;
   image: string;
   action_popup?: PopupProps;
 }
 
-interface SliderImagesProps {
+export interface SliderImagesProps {
   title?: string;
   images: ImageItemProps[];
 }
