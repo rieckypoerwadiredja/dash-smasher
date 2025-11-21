@@ -6,6 +6,7 @@ import BookingFooter from "@/app/components/fragments/BookingFooter";
 import DateSlider from "@/app/components/fragments/DateSlider";
 import ParalaxImage from "@/app/components/fragments/ParalaxImage";
 import { Slider } from "@/app/components/fragments/Slider";
+import StatusMessage from "@/app/components/fragments/status/StatusMessage";
 import TimeSlotPicker from "@/app/components/fragments/TimeSlotPicker";
 import { API_BASE_URL } from "@/app/utils/fetcher";
 import generateId from "@/app/utils/generateId";
@@ -50,6 +51,8 @@ export default function Page() {
   const [timeSlots, setTimeSlots] = useState<string[]>([]);
   const [timeLabel, setTimeLabel] = useState<string>("");
 
+  const [error, setError] = useState<string | null>(null);
+
   // Fetch API
   useEffect(() => {
     async function fetchSheets() {
@@ -58,6 +61,12 @@ export default function Page() {
           fetch(`${API_BASE_URL}/api/sheets/courts/${id}`),
           fetch(`${API_BASE_URL}/api/sheets/books/${id}`),
         ]);
+
+        if (!resCourt.ok) {
+          const { error } = await resCourt.json();
+          setError(error || "Court not found");
+          return;
+        }
 
         const courtData = await resCourt.json();
         const bookData = await resBook.json();
@@ -333,6 +342,20 @@ export default function Page() {
     { length: daysInMonth - currentDay + 1 },
     (_, i) => i + currentDay
   );
+
+  if (error) {
+    return (
+      <div className="px-5 p-10 flex items-center justify-center">
+        <StatusMessage
+          data={{
+            title: error,
+            desc: "Please try again later.",
+            status: "not-found",
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen">

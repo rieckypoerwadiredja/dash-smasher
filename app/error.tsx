@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
+import StatusMessage from "./components/fragments/status/StatusMessage";
+import { NavMob } from "./components/fragments/Nav";
+import Footer from "./components/fragments/Footer";
 
 export default function Error({
   error,
@@ -15,19 +18,19 @@ export default function Error({
   }, [error]);
 
   return (
-    <body>
-      <main className="flex h-full flex-col items-center justify-center">
-        <h2 className="text-center">Something went wrong! {error.message}</h2>
-        <button
-          className="mt-4 rounded-md bg-blue-500 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-400"
-          onClick={
-            // Attempt to recover by trying to re-render the invoices route
-            () => reset()
-          }
-        >
-          Try again
-        </button>
-      </main>
+    <body className="max-w-[1440px] mx-auto">
+      {/* Wrapper center */}
+      <div className="px-5 p-10 flex items-center justify-center">
+        <StatusMessage
+          data={{
+            title: "Oops, the server didn't respond!",
+            desc: error.message || "Please try again later.",
+            status: "error",
+          }}
+        />
+      </div>
+
+      <NavMob />
     </body>
   );
 }

@@ -1,4 +1,4 @@
-import CourtClientWrapper from "@/app/components/fragments/CourtClientWrapper";
+import CourtsClientWrapper from "@/app/components/fragments/CourtsClientWrapper";
 import Section from "@/app/components/fragments/Section";
 import { API_BASE_URL, fetchData } from "@/app/utils/fetcher";
 import { mapCourtToCardData } from "@/app/utils/mapers/courtMapers";
@@ -23,7 +23,7 @@ export default async function CourtsPage() {
 
   return (
     <Section title="Avalaible Courts">
-      <CourtClientWrapper initialCards={cards} />
+      <CourtsClientWrapper initialCards={cards} />
     </Section>
   );
 }

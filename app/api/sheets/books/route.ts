@@ -1,10 +1,12 @@
-import { google } from "googleapis";
+import { Book } from "@/app/(fullscreen)/courts/[id]/page";
+import { addBook, getBooks } from "@/app/services/books.service";
 import { NextResponse } from "next/server";
 
-// POST untuk menambahkan booking baru
+// POST
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as Partial<Book>;
+
     const {
       id,
       court_id,
@@ -17,7 +19,7 @@ export async function POST(request: Request) {
       status,
     } = body;
 
-    // Validasi sederhana
+    // Validation
     if (
       !id ||
       !court_id ||
@@ -35,46 +37,31 @@ export async function POST(request: Request) {
       );
     }
 
-    const auth = new google.auth.GoogleAuth({
-      credentials: {
-        client_email: process.env.GOOGLE_CLIENT_EMAIL,
-        private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-      },
-      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-    });
-
-    const sheets = google.sheets({ version: "v4", auth });
-    const spreadsheetId = process.env.SPREADSHEET_ID!;
-
-    // Format data sesuai urutan kolom di sheet "books"
-    const values = [
-      [
-        id,
-        court_id,
-        court_number,
-        user,
-        email,
-        start_time,
-        end_time,
-        date,
-        status,
-      ],
-    ];
-
-    await sheets.spreadsheets.values.append({
-      spreadsheetId,
-      range: "books!A:I", // kolom sesuai urutan
-      valueInputOption: "USER_ENTERED",
-      requestBody: {
-        values,
-      },
-    });
+    await addBook(body as Book);
 
     return NextResponse.json({ message: "Booking added successfully" });
   } catch (err) {
     console.error(err);
     return NextResponse.json(
       { error: "Failed to add booking" },
+      { status: 500 }
+    );
+  }
+}
+
+// GET
+export async function GET(request: Request) {
+  try {
+    const url = new URL(request.url);
+    const emailFilter = url.searchParams.get("email") ?? undefined;
+
+    const books = await getBooks(emailFilter);
+
+    return NextResponse.json({ data: books });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { error: "Failed to fetch bookings" },
       { status: 500 }
     );
   }

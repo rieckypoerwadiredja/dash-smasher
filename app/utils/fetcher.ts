@@ -66,6 +66,7 @@ export async function handleJoin(
       { method: "POST", body: payload }
     );
     alert(data.message || "Successfully joined!");
+    route.refresh();
   } catch (err) {
     console.log(err);
     alert(err instanceof Error ? err.message : "Failed to join");

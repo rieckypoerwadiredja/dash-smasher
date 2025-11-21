@@ -3,10 +3,10 @@ import SkeletonImage from "../fragments/SkeletonImage";
 interface InfoListProps {
   image: string;
   title: string;
-  participants: string;
+  desc: string;
 }
 
-export default function Info({ image, title, participants }: InfoListProps) {
+export default function Info({ image, title, desc }: InfoListProps) {
   return (
     <li className="py-2 list-none">
       <div className="flex items-center">
@@ -24,7 +24,10 @@ export default function Info({ image, title, participants }: InfoListProps) {
         {/* Teks */}
         <div className="flex-1 min-w-0 ml-4 space-y-2">
           <p className="text-xl font-normal text-black">{title}</p>
-          <p className="text-md text-gray-400">{participants}</p>
+          <p
+            className="text-md text-gray-400"
+            dangerouslySetInnerHTML={{ __html: desc }}
+          />
         </div>
       </div>
     </li>

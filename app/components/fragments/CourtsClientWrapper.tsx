@@ -6,7 +6,7 @@ import FilterCourt from "./FilterCourt";
 interface CourtClientWrapperProps {
   initialCards: MainCardProps[];
 }
-function CourtClientWrapper({ initialCards }: CourtClientWrapperProps) {
+function CourtsClientWrapper({ initialCards }: CourtClientWrapperProps) {
   const [filteredCards, setFilteredCards] = useState(initialCards);
   const handleFilterChange = useCallback(
     (filters: {
@@ -47,4 +47,4 @@ function CourtClientWrapper({ initialCards }: CourtClientWrapperProps) {
   );
 }
 
-export default CourtClientWrapper;
+export default CourtsClientWrapper;

@@ -4,65 +4,25 @@ import Section from "./Section";
 import CardGrid from "./CardGrid";
 import Info, { InfoSkeleton } from "../elements/Info";
 
-interface Activity {
-  image: string;
+export interface Activity {
+  image?: string;
   title: string;
   desc: string;
 }
 
-export default function RecentActivityList() {
-  const activities: Activity[] = [
-    {
-      image: "/events/event1.jpg",
-      title: "Badminton Training",
-      desc: "with Anton Suginto",
-    },
-    {
-      image: "/events/event2.jpg",
-      title: "Junior Match",
-      desc: "35 participants",
-    },
-    {
-      image: "/events/event3.jpg",
-      title: "Badminton Training",
-      desc: "with Doni, Budi Sugandi",
-    },
-    {
-      image: "/events/event1.jpg",
-      title: "Badminton Training",
-      desc: "with Anton Suginto",
-    },
-    {
-      image: "/events/event2.jpg",
-      title: "Junior Match",
-      desc: "35 participants",
-    },
-    {
-      image: "/events/event3.jpg",
-      title: "Badminton Training",
-      desc: "with Doni, Budi Sugandi",
-    },
-    {
-      image: "/events/event1.jpg",
-      title: "Badminton Training",
-      desc: "with Anton Suginto",
-    },
-    {
-      image: "/events/event2.jpg",
-      title: "Junior Match",
-      desc: "35 participants",
-    },
-    {
-      image: "/events/event3.jpg",
-      title: "Badminton Training",
-      desc: "with Doni, Budi Sugandi",
-    },
-  ];
-
+export default function RecentActivityList({
+  activities,
+  limit = false,
+}: {
+  activities: Activity[];
+  limit?: boolean;
+}) {
   const [showAll, setShowAll] = useState(false);
   const visibleActivities = showAll
-    ? activities.slice(-6)
-    : activities.slice(-3);
+    ? activities
+    : limit
+    ? activities.slice(0, 3)
+    : activities;
 
   return (
     <Section title="Recent Activity" className="w-full flex-col items-start">
@@ -70,9 +30,9 @@ export default function RecentActivityList() {
         {visibleActivities.map((activity, index) => (
           <Info
             key={index}
-            image={activity.image}
+            image={activity.image || "/mascot/mascot.png"}
             title={activity.title}
-            participants={activity.desc}
+            desc={activity.desc}
           />
         ))}
       </CardGrid>

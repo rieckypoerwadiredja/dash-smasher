@@ -1,4 +1,6 @@
-import RecentActivityList from "../components/fragments/RecentActivityList";
+import RecentActivityList, {
+  Activity,
+} from "../components/fragments/RecentActivityList";
 import { API_BASE_URL, fetchData } from "../utils/fetcher";
 import { Event, EventMember } from "./events/page";
 import CardList from "../components/fragments/CardList";
@@ -26,10 +28,59 @@ export default async function Home() {
       `${API_BASE_URL}/api/sheets/event_member?email=${session.user.email}`
     );
   }
+
+  // conoth data
+  const activities: Activity[] = [
+    {
+      image: "/events/event1.jpg",
+      title: "Badminton Training",
+      desc: "with Anton Suginto",
+    },
+    {
+      image: "/events/event2.jpg",
+      title: "Junior Match",
+      desc: "35 participants",
+    },
+    {
+      image: "/events/event3.jpg",
+      title: "Badminton Training",
+      desc: "with Doni, Budi Sugandi",
+    },
+    {
+      image: "/events/event1.jpg",
+      title: "Badminton Training",
+      desc: "with Anton Suginto",
+    },
+    {
+      image: "/events/event2.jpg",
+      title: "Junior Match",
+      desc: "35 participants",
+    },
+    {
+      image: "/events/event3.jpg",
+      title: "Badminton Training",
+      desc: "with Doni, Budi Sugandi",
+    },
+    {
+      image: "/events/event1.jpg",
+      title: "Badminton Training",
+      desc: "with Anton Suginto",
+    },
+    {
+      image: "/events/event2.jpg",
+      title: "Junior Match",
+      desc: "35 participants",
+    },
+    {
+      image: "/events/event3.jpg",
+      title: "Badminton Training",
+      desc: "with Doni, Budi Sugandi",
+    },
+  ];
   return (
     <>
       <HomeClientWrapper data={eventSliders} userEvents={userEvents} />
-      <RecentActivityList />
+      <RecentActivityList limit activities={activities} />
       <CardList
         title="Court Availability Status"
         cards={cards}

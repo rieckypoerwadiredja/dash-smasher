@@ -14,7 +14,7 @@ export default function StatusMessage({ data }: { data: StatusProps }) {
   };
 
   const imageError = {
-    src: "/mascot/sleppy-min.png",
+    src: "/mascot/sleepy-min.png",
     alt: "error",
   };
   const imageEmpty = {
