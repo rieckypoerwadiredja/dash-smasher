@@ -2,7 +2,7 @@ import { getSheetsClient } from "../utils/sheets";
 
 const spreadsheetId = process.env.SPREADSHEET_ID!;
 
-export async function getCourtById(id: string) {
+export async function getCourt(id: string) {
   try {
     if (!id) {
       return {
@@ -61,7 +61,7 @@ export async function getCourtById(id: string) {
   }
 }
 
-export async function getAllCourts() {
+export async function getCourts() {
   try {
     const sheets = await getSheetsClient();
     const spreadsheetId = process.env.SPREADSHEET_ID!;

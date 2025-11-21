@@ -3,10 +3,8 @@ import Button from "./Button";
 import SkeletonImage from "../fragments/SkeletonImage";
 import { CardDesc, CardTitle } from "./Text";
 import ConditionalLink from "./conditionals/ConditionalLink";
-import ConditionalPopup, {
-  ConditionalPopupProps,
-} from "./conditionals/ConditionalPopup";
-import { CardPoupProps, PopupProps } from "../fragments/popup/CardPoup";
+import ConditionalPopup from "./conditionals/ConditionalPopup";
+import { PopupProps } from "../fragments/popup/CardPoup";
 
 export function CardSkeleton() {
   return (
@@ -70,18 +68,20 @@ export function MainCard({ card }: { card: MainCardProps }) {
           <CardTitle>{name}</CardTitle>
           <div className="flex items-center justify-between gap-2">
             <CardDesc>{desc}</CardDesc>
-            <ConditionalPopup data={action_popup}>
-              <Button
-                link={action_link}
-                disabled={
-                  action_link === "disabled" ||
-                  action_name === "Already Registered"
-                }
-                className="cursor-pointer px-3 py-1 text-sm"
-              >
-                {action_name}
-              </Button>
-            </ConditionalPopup>
+            {(action_link || action_name || action_popup) && (
+              <ConditionalPopup data={action_popup}>
+                <Button
+                  link={action_link}
+                  disabled={
+                    action_link === "disabled" ||
+                    action_name === "Already Registered"
+                  }
+                  className="cursor-pointer px-3 py-1 text-sm"
+                >
+                  {action_name}
+                </Button>
+              </ConditionalPopup>
+            )}
           </div>
         </div>
       </div>

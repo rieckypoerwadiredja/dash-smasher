@@ -2,7 +2,6 @@ import { Book } from "@/app/(fullscreen)/courts/[id]/page";
 import { addBook, getBooks } from "@/app/services/books.service";
 import { NextResponse } from "next/server";
 
-// POST
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as Partial<Book>;
@@ -19,7 +18,7 @@ export async function POST(request: Request) {
       status,
     } = body;
 
-    // Validation
+    // validation
     if (
       !id ||
       !court_id ||
@@ -32,36 +31,37 @@ export async function POST(request: Request) {
       !status
     ) {
       return NextResponse.json(
-        { error: "All fields are required" },
+        { success: false, message: "All fields are required" },
         { status: 400 }
       );
     }
 
-    await addBook(body as Book);
+    const result = await addBook(body as Book);
 
-    return NextResponse.json({ message: "Booking added successfully" });
+    return NextResponse.json(result, { status: result.status });
   } catch (err) {
-    console.error(err);
+    console.error("POST /books error:", err);
+
     return NextResponse.json(
-      { error: "Failed to add booking" },
+      { success: false, message: "Failed to add booking" },
       { status: 500 }
     );
   }
 }
 
-// GET
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
-    const emailFilter = url.searchParams.get("email") ?? undefined;
+    const email = url.searchParams.get("email") ?? undefined;
 
-    const books = await getBooks(emailFilter);
+    const result = await getBooks(email);
 
-    return NextResponse.json({ data: books });
+    return NextResponse.json(result, { status: result.status });
   } catch (err) {
-    console.error(err);
+    console.error("GET /books error:", err);
+
     return NextResponse.json(
-      { error: "Failed to fetch bookings" },
+      { success: false, message: "Failed to fetch bookings" },
       { status: 500 }
     );
   }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCourtById } from "@/app/services/court.service";
+import { getCourt } from "@/app/services/court.service";
 
 export async function GET(request: Request) {
   try {
@@ -7,7 +7,7 @@ export async function GET(request: Request) {
     const pathSegments = url.pathname.split("/");
     const id = pathSegments[pathSegments.length - 1];
 
-    const result = await getCourtById(id);
+    const result = await getCourt(id);
 
     //  error
     if (!result.success) {

@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import {
-  getEventMembersByEmail,
   addEventMember,
+  getEventMember,
 } from "@/app/services/eventMember.service";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const email = url.searchParams.get("email") ?? "";
 
-  const result = await getEventMembersByEmail(email);
+  const result = await getEventMember(email);
 
   if (!result.success) {
     return NextResponse.json(

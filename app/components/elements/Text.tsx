@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 
 export function CardTitle({ children }: { children: string }) {
   return (
@@ -27,15 +27,21 @@ export function Paragraph({
   children,
   className,
 }: {
-  children: string;
+  children: string | ReactNode;
   className?: string;
 }) {
-  return (
-    <p
-      className={`text-gray-500 text-sm ${className}`}
-      dangerouslySetInnerHTML={{ __html: children }}
-    ></p>
-  );
+  const isString = typeof children === "string";
+
+  if (isString) {
+    return (
+      <p
+        className={`text-gray-500 text-sm ${className}`}
+        dangerouslySetInnerHTML={{ __html: children }}
+      />
+    );
+  }
+
+  return <p className={`text-gray-500 text-sm ${className}`}>{children}</p>;
 }
 
 export function SectionTitle({

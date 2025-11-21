@@ -1,39 +1,35 @@
-import Button from "@/app/components/elements/Button";
 import { Paragraph } from "@/app/components/elements/Text";
-import RecentActivityList, {
-  Activity,
-} from "@/app/components/fragments/RecentActivityList";
 import SkeletonImage from "@/app/components/fragments/SkeletonImage";
 import { API_BASE_URL, fetchData } from "@/app/utils/fetcher";
 import { protectedPage } from "@/app/utils/protectedPage";
 import { Book } from "../courts/[id]/page";
-import { EventMember } from "@/app/(main)/events/page";
 import { redirect } from "next/navigation";
+import { Event } from "@/app/(main)/events/page";
+import { mapHistoryToActivities } from "@/app/utils/mapers/historyMapers";
+import CardList from "@/app/components/fragments/CardList";
 
+export interface HistoryBook extends Book {
+  name: string;
+  image: string;
+}
+
+export interface HistoryEvent extends Event {
+  name: string;
+  image: string;
+}
+
+export interface History {
+  books: HistoryBook[];
+  events: HistoryEvent[];
+}
 export default async function ProfilePage() {
   const session = await protectedPage();
   if (!session.user) redirect("/login");
 
-  const [books, event_member] = await Promise.all([
-    fetchData<Book[]>(
-      `${API_BASE_URL}/api/sheets/books?email=${session.user.email}`
-    ),
-    fetchData<EventMember[]>(
-      `${API_BASE_URL}/api/sheets/event_member?email=${session.user.email}`
-    ),
-  ]);
-  const activities: Activity[] = [
-    ...books.map((book) => ({
-      // image: book.im,
-      title: `Booking: Court ${book.court_number}`,
-      desc: `Status: ${book.status} | <br/> ${book.start_time} - ${book.end_time}`,
-    })),
-    ...event_member.map((member) => ({
-      // image:"",
-      title: `Member: Event ${member.event_id}`,
-      desc: `Event Member`,
-    })),
-  ];
+  const history = await fetchData<History>(
+    `${API_BASE_URL}/api/sheets/history?email=${session.user.email}&limit=4`
+  );
+  const activities = [history].map(mapHistoryToActivities)[0];
 
   return (
     <div className="min-h-screen flex flex-col gap-y-5 items-center p-4 md:p-10 mx-auto">
@@ -59,16 +55,22 @@ export default async function ProfilePage() {
       <div className="w-full bg-white p-5 rounded-2xl flex flex-col gap-y-2 max-w-2xl">
         <div className="flex justify-between">
           <Paragraph className="font-semibold">Email</Paragraph>
-          <Paragraph className="font-semibold">doni@gmail.com</Paragraph>
+          <Paragraph className="font-semibold">{session.user.email}</Paragraph>
         </div>
         <div className="flex justify-between">
-          <Paragraph className="font-semibold">Phone</Paragraph>
-          <Paragraph className="font-semibold">123321235</Paragraph>
+          <Paragraph className="font-semibold">Name</Paragraph>
+          <Paragraph className="font-semibold">{session.user.name}</Paragraph>
         </div>
       </div>
-      <RecentActivityList activities={activities} />
-
-      <Button className="w-full max-w-2xl">Log Out</Button>
+      <CardList
+        cards={activities}
+        title="Activities"
+        status={{
+          title: "Oops, event not found",
+          desc: "Try other keywords",
+          status: "empty",
+        }}
+      />
     </div>
   );
 }

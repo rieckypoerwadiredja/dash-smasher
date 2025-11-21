@@ -4,7 +4,7 @@ import { EventMember } from "../(main)/events/page";
 const spreadsheetId = process.env.SPREADSHEET_ID!;
 
 // GET — find by email
-export async function getEventMembersByEmail(email: string) {
+export async function getEventMember(email: string) {
   try {
     if (!email) {
       return {

@@ -1,8 +1,8 @@
-import { getAllCourts } from "@/app/services/court.service";
+import { getCourts } from "@/app/services/court.service";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const result = await getAllCourts();
+  const result = await getCourts();
 
   if (!result.success) {
     return NextResponse.json(
