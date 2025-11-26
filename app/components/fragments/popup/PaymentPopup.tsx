@@ -14,7 +14,7 @@ export default function PaymentPopup({ token, onClose }: Props) {
   // Load script 1x
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = process.env.MIDTRANS_SNAP_URL!;
+    script.src = process.env.NEXT_PUBLIC_MIDTRANS_SNAP_URL!;
     script.setAttribute(
       "data-client-key",
       process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY!
