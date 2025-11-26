@@ -5,10 +5,11 @@ import BookingFooter from "@/app/components/fragments/BookingFooter";
 
 import DateSlider from "@/app/components/fragments/DateSlider";
 import ParalaxImage from "@/app/components/fragments/ParalaxImage";
+import PaymentPopup from "@/app/components/fragments/popup/PaymentPopup";
 import { Slider } from "@/app/components/fragments/Slider";
 import StatusMessage from "@/app/components/fragments/status/StatusMessage";
 import TimeSlotPicker from "@/app/components/fragments/TimeSlotPicker";
-import { API_BASE_URL } from "@/app/utils/fetcher";
+import { API_BASE_URL, fetchData } from "@/app/utils/fetcher";
 import generateId from "@/app/utils/generateId";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
@@ -24,6 +25,8 @@ export interface Book {
   end_time: string;
   date: string;
   status: string;
+  total_price: number;
+  payment_type: string;
 }
 
 export default function Page() {
@@ -35,6 +38,8 @@ export default function Page() {
 
   const [court, setCourt] = useState<Court | null>(null);
   const [books, setBooks] = useState<Book[]>([]);
+  const [token, setToken] = useState("");
+
   const [form, setForm] = useState({
     id: "",
     court_id: "",
@@ -44,7 +49,9 @@ export default function Page() {
     start_time: "",
     end_time: "",
     date: "",
-    status: "unpaid",
+    status: "-", // value from midtrans
+    total_price: 0,
+    payment_type: "-", // value from midtrans
   });
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -90,17 +97,21 @@ export default function Page() {
                 .join(":")
             : "",
         }));
+        console.log(formattedBooks);
+
+        // ! status "-" && payment_type "-" === Cancle payment
+        const formatValidBooks = formattedBooks.filter(
+          (book: Book) => book.status !== "-" && book.payment_type !== "-"
+        );
 
         setCourt(courtData.data);
-        setBooks(formattedBooks || []);
+        setBooks(formatValidBooks || []);
       } catch (err) {
         console.error(err);
       }
     }
     fetchSheets();
   }, [id]);
-
-  const [price, setPrice] = useState<number>(0);
 
   // Set Price
   useEffect(() => {
@@ -111,9 +122,17 @@ export default function Page() {
     const duration = endHour - startHour;
 
     if (duration > 0) {
-      setPrice((court.price_per_hour * duration) / 1000);
+      const price = court.price_per_hour * duration;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setForm((prev) => ({
+        ...prev,
+        total_price: price,
+      }));
     } else {
-      setPrice(0);
+      setForm((prev) => ({
+        ...prev,
+        total_price: 0,
+      }));
     }
   }, [court, form.start_time, form.end_time]);
 
@@ -141,6 +160,7 @@ export default function Page() {
       }
     }
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTimeSlots(slots);
   }, [court, selectedDate]);
 
@@ -266,7 +286,8 @@ export default function Page() {
       !form.court_number ||
       !form.start_time ||
       !form.end_time ||
-      !form.date
+      !form.date ||
+      !form.total_price
     ) {
       alert("Semua field harus diisi sebelum booking!");
       return;
@@ -277,10 +298,12 @@ export default function Page() {
       ...form,
       id: idGen,
       court_id: court?.id || "",
-      email: session.user.email,
+      email: session?.user?.email ?? "",
     };
 
+    setForm(bookingData);
     try {
+      // TODO post data to Spreadsheet
       const res = await fetch(`${API_BASE_URL}/api/sheets/books`, {
         method: "POST",
         headers: {
@@ -288,19 +311,37 @@ export default function Page() {
         },
         body: JSON.stringify(bookingData),
       });
-      console.log(form);
 
       const data = await res.json();
-      console.log(data);
+      // console.log(data);
       if (!res.ok) {
         throw new Error(
-          data.error || "Gagal melakukan booking. Silakan coba lagi."
+          data.error || "Failed to make a booking. Please try again."
         );
       }
-      console.log("Booking success:", data);
 
-      alert("Booking success!");
+      // TODO Payment Token
+      const midtransToken = await fetch(
+        `${API_BASE_URL}/api/midtrans/tokenizer`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(bookingData),
+        }
+      );
 
+      const midtransData = await midtransToken.json();
+
+      if (!midtransToken.ok) {
+        alert(midtransData.error || "Gagal membuat transaksi.");
+        return;
+      }
+      setToken(midtransData.token);
+
+      setTimeLabel("");
+      setSelectedDate(null);
       // Reset form setelah booking
       setForm({
         id: "",
@@ -311,12 +352,10 @@ export default function Page() {
         start_time: "",
         end_time: "",
         date: "",
-        status: "unpaid",
+        status: "-",
+        total_price: 0,
+        payment_type: "-",
       });
-
-      setTimeLabel("");
-      setSelectedDate(null);
-      window.location.reload();
     } catch (err: unknown) {
       if (err instanceof Error) {
         alert(err.message);
@@ -442,7 +481,14 @@ export default function Page() {
                 </div>
               </div>
 
-              <BookingFooter price={price} onBook={handleBookNow} />
+              <BookingFooter price={form.total_price} onBook={handleBookNow} />
+              <PaymentPopup
+                token={token}
+                onClose={async () => {
+                  setToken("");
+                  window.location.reload();
+                }}
+              />
             </div>
           </div>
         </>

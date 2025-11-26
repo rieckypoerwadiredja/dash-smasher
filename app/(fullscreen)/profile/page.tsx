@@ -5,7 +5,10 @@ import { protectedPage } from "@/app/utils/protectedPage";
 import { Book } from "../courts/[id]/page";
 import { redirect } from "next/navigation";
 import { Event } from "@/app/(main)/events/page";
-import { mapHistoryToActivities } from "@/app/utils/mapers/historyMapers";
+import {
+  mapBookToActivities,
+  mapEventToActivities,
+} from "@/app/utils/mapers/historyMapers";
 import CardList from "@/app/components/fragments/CardList";
 
 export interface HistoryBook extends Book {
@@ -22,6 +25,9 @@ export interface History {
   books: HistoryBook[];
   events: HistoryEvent[];
 }
+
+// update section
+// unpaid (paling atas), paid, hostory dlu (exp cek jam mulai sm selesai + tgl hari book)
 export default async function ProfilePage() {
   const session = await protectedPage();
   if (!session.user) redirect("/login");
@@ -29,7 +35,8 @@ export default async function ProfilePage() {
   const history = await fetchData<History>(
     `${API_BASE_URL}/api/sheets/history?email=${session.user.email}&limit=4`
   );
-  const activities = [history].map(mapHistoryToActivities)[0];
+  const bookHistory = [history].map(mapBookToActivities)[0];
+  const eventHistory = [history].map(mapEventToActivities)[0];
 
   return (
     <div className="min-h-screen flex flex-col gap-y-5 items-center p-4 md:p-10 mx-auto">
@@ -63,8 +70,17 @@ export default async function ProfilePage() {
         </div>
       </div>
       <CardList
-        cards={activities}
-        title="Activities"
+        cards={bookHistory}
+        title="Book History"
+        status={{
+          title: "Oops, event not found",
+          desc: "Try other keywords",
+          status: "empty",
+        }}
+      />
+      <CardList
+        cards={eventHistory}
+        title="Event History"
         status={{
           title: "Oops, event not found",
           desc: "Try other keywords",

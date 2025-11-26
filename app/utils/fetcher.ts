@@ -5,7 +5,11 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export async function fetchData<T>(
   url: string,
-  options?: { runtime?: boolean; method?: "GET" | "POST"; body?: unknown }
+  options?: {
+    runtime?: boolean;
+    method?: "GET" | "POST" | "PUT";
+    body?: unknown;
+  }
 ): Promise<T> {
   const fetchOptions: RequestInit = {
     method: options?.method || "GET",

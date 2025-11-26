@@ -9,7 +9,7 @@ export async function getBooks(email?: string) {
 
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: "books!A:I",
+      range: "books!A:K",
     });
 
     let rows = response.data.values || [];
@@ -38,6 +38,8 @@ export async function getBooks(email?: string) {
       end_time: row[6],
       date: row[7],
       status: row[8],
+      total_price: row[9],
+      payment_type: row[10],
     }));
 
     return {
@@ -58,13 +60,110 @@ export async function getBooks(email?: string) {
   }
 }
 
-export async function addBook(data: Book) {
+export async function updateBookById(id: string, newData: Partial<Book>) {
   try {
     const sheets = await getSheetsClient();
 
+    // Get all Books
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "books!A:K",
+    });
+
+    const rows = response.data.values || [];
+
+    if (rows.length === 0) {
+      return {
+        success: false,
+        status: 404,
+        message: "No data found",
+        data: null,
+      };
+    }
+
+    // Find book by id
+    const rowIndex = rows.findIndex((row) => row[0] === id);
+
+    if (rowIndex === -1) {
+      return {
+        success: false,
+        status: 404,
+        message: "Booking not found",
+        data: null,
+      };
+    }
+
+    const oldRow = rows[rowIndex];
+
+    // convert row to object
+    const oldData: Book = {
+      id: oldRow[0],
+      court_id: oldRow[1],
+      court_number: oldRow[2],
+      user: oldRow[3],
+      email: oldRow[4],
+      start_time: oldRow[5],
+      end_time: oldRow[6],
+      date: oldRow[7],
+      status: oldRow[8],
+      total_price: oldRow[9],
+      payment_type: oldRow[10],
+    };
+
+    // merge with new data
+    const updated: Book = {
+      ...oldData,
+      ...newData, //  overwrite field from user
+    };
+
+    // Update row to Google Sheet
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: `books!A${rowIndex + 1}:K${rowIndex + 1}`, // row number (1-based)
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: [
+          [
+            updated.id,
+            updated.court_id,
+            updated.court_number,
+            updated.user,
+            updated.email,
+            updated.start_time,
+            updated.end_time,
+            updated.date,
+            updated.status,
+            updated.total_price,
+            updated.payment_type,
+          ],
+        ],
+      },
+    });
+
+    return {
+      success: true,
+      status: 200,
+      message: "Booking updated successfully",
+      data: updated,
+    };
+  } catch (error) {
+    console.error("updateBookById error:", error);
+
+    return {
+      success: false,
+      status: 500,
+      message: "Failed to update booking",
+      data: null,
+    };
+  }
+}
+
+export async function addBook(data: Book) {
+  try {
+    const sheets = await getSheetsClient();
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: "books!A:I",
+      range: "books!A:K",
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [
@@ -78,6 +177,8 @@ export async function addBook(data: Book) {
             data.end_time,
             data.date,
             data.status,
+            data.total_price,
+            data.payment_type,
           ],
         ],
       },

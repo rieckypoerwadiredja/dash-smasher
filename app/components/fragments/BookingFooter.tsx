@@ -11,9 +11,9 @@ export default function BookingFooter({ price, onBook }: BookingFooterProps) {
     <div className="absolute max-w-[800px] rounded-xl mx-auto bottom-20 md:bottom-5 left-0 right-0 flex w-full bg-white shadow-lg p-5 justify-between items-center">
       <div>
         <div className="flex gap-x-2 items-center">
-          <p className="text-2xl font-bold text-black">Rp.{price}K</p>
+          <p className="text-2xl font-bold text-black">Rp.{price / 1000}K</p>
           <p className="text-lg italic line-through text-dark-gray">
-            Rp.{price}K
+            Rp.{price / 1000}K
           </p>
         </div>
         <p className="text-xs text-dark-gray">

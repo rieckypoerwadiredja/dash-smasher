@@ -1,5 +1,10 @@
 import { Book } from "@/app/(fullscreen)/courts/[id]/page";
-import { addBook, getBooks } from "@/app/services/books.service";
+import {
+  addBook,
+  getBooks,
+  updateBookById,
+} from "@/app/services/books.service";
+import { request } from "http";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -16,8 +21,9 @@ export async function POST(request: Request) {
       end_time,
       date,
       status,
+      total_price,
+      payment_type,
     } = body;
-
     // validation
     if (
       !id ||
@@ -28,7 +34,9 @@ export async function POST(request: Request) {
       !start_time ||
       !end_time ||
       !date ||
-      !status
+      !status ||
+      !total_price ||
+      !payment_type
     ) {
       return NextResponse.json(
         { success: false, message: "All fields are required" },
@@ -44,6 +52,33 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       { success: false, message: "Failed to add booking" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+
+    const { id, ...updateFields } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, message: "ID is required" },
+        { status: 400 }
+      );
+    }
+
+    // update service
+    const result = await updateBookById(id, updateFields);
+
+    return NextResponse.json(result, { status: result.status });
+  } catch (error) {
+    console.error("PUT /books error:", error);
+
+    return NextResponse.json(
+      { success: false, message: "Failed to update booking" },
       { status: 500 }
     );
   }
