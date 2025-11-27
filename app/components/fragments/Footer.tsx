@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { IMAGES } from "@/app/constants/image";
 
 export default function Footer() {
   return (
@@ -10,7 +11,7 @@ export default function Footer() {
         {/* Logo & Description */}
         <div className="flex flex-col items-start gap-4 md:w-1/3">
           <Image
-            src="/full-logo.png"
+            src={IMAGES.fullLogo}
             alt="Logo"
             width={120}
             height={40}

@@ -43,7 +43,9 @@ export default function SkeletonImage({
         src={src}
         alt={alt}
         fill
-        className={`object-cover rounded-xl transition-opacity duration-500 ${
+        className={`${
+          src.includes("data:image/") && "object-contain!"
+        }object-cover rounded-xl transition-opacity duration-500 ${
           loaded ? "opacity-100" : "opacity-0"
         } ${customImage}`}
         onLoad={() => setLoaded(true)}

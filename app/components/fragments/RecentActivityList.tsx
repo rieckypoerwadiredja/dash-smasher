@@ -3,6 +3,7 @@ import { useState } from "react";
 import Section from "./Section";
 import CardGrid from "./CardGrid";
 import Info, { InfoSkeleton } from "../elements/Info";
+import { IMAGES } from "@/app/constants/image";
 
 export interface Activity {
   image?: string;
@@ -30,7 +31,7 @@ export default function RecentActivityList({
         {visibleActivities.map((activity, index) => (
           <Info
             key={index}
-            image={activity.image || "/mascot/mascot.png"}
+            image={activity.image || IMAGES.mainMascot}
             title={activity.title}
             desc={activity.desc}
           />

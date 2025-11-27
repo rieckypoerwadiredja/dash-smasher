@@ -27,6 +27,7 @@ export interface Book {
   status: string;
   total_price: number;
   payment_type: string;
+  check_in: boolean;
 }
 
 export default function Page() {
@@ -52,6 +53,7 @@ export default function Page() {
     status: "-", // value from midtrans
     total_price: 0,
     payment_type: "-", // value from midtrans
+    check_in: false,
   });
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -316,7 +318,7 @@ export default function Page() {
       // console.log(data);
       if (!res.ok) {
         throw new Error(
-          data.error || "Failed to make a booking. Please try again."
+          data.message || "Failed to make a booking. Please try again."
         );
       }
 
@@ -355,6 +357,7 @@ export default function Page() {
         status: "-",
         total_price: 0,
         payment_type: "-",
+        check_in: false,
       });
     } catch (err: unknown) {
       if (err instanceof Error) {

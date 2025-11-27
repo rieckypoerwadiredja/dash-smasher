@@ -4,7 +4,6 @@ import {
   getBooks,
   updateBookById,
 } from "@/app/services/books.service";
-import { request } from "http";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -23,6 +22,7 @@ export async function POST(request: Request) {
       status,
       total_price,
       payment_type,
+      check_in,
     } = body;
     // validation
     if (
@@ -36,7 +36,8 @@ export async function POST(request: Request) {
       !date ||
       !status ||
       !total_price ||
-      !payment_type
+      !payment_type ||
+      check_in === undefined
     ) {
       return NextResponse.json(
         { success: false, message: "All fields are required" },
@@ -72,7 +73,6 @@ export async function PUT(request: Request) {
 
     // update service
     const result = await updateBookById(id, updateFields);
-
     return NextResponse.json(result, { status: result.status });
   } catch (error) {
     console.error("PUT /books error:", error);

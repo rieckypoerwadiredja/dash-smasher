@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "../globals.css";
-import Footer from "../components/fragments/Footer";
 import SessionWrapper from "../components/elements/SessionWrapper";
 
 export const metadata: Metadata = {

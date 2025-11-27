@@ -1,3 +1,4 @@
+import { IMAGES } from "@/app/constants/image";
 import Image from "next/image";
 import React from "react";
 
@@ -9,16 +10,16 @@ export interface StatusProps {
 
 export default function StatusMessage({ data }: { data: StatusProps }) {
   const imageNotFound = {
-    src: "/mascot/not-found-min.png",
+    src: IMAGES.notFoundMascot,
     alt: "not-found",
   };
 
   const imageError = {
-    src: "/mascot/sleepy-min.png",
+    src: IMAGES.sleepyMascot,
     alt: "error",
   };
   const imageEmpty = {
-    src: "/mascot/sad-min.png",
+    src: IMAGES.sadMascot,
     alt: "error",
   };
 

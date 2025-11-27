@@ -9,6 +9,7 @@ import { Paragraph, SectionTitle } from "../elements/Text";
 import Link from "next/link";
 import SkeletonImage from "./SkeletonImage";
 import { signIn } from "next-auth/react";
+import { IMAGES } from "@/app/constants/image";
 
 export default function LoginForm() {
   return (
@@ -17,7 +18,7 @@ export default function LoginForm() {
         <div className="relative sm:mx-auto sm:w-full sm:max-w-sm">
           <SkeletonImage
             className="w-20 md:w-30 mx-auto"
-            src="/full-logo.png"
+            src={IMAGES.fullLogo}
             alt="Logo"
             width={120}
             aspectRatio={2 / 1}

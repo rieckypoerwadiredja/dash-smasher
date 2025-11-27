@@ -5,10 +5,10 @@ import { CardDesc, CardTitle } from "../../elements/Text";
 import Button from "../../elements/Button";
 import { FaCalendarAlt } from "react-icons/fa";
 import { IconProfiles } from "../../elements/Icons";
-
+import Popup from "./Popup";
 interface subTitle {
   date: string;
-  members: number;
+  members: number | string;
 }
 export interface PopupProps {
   image: string;
@@ -46,63 +46,42 @@ export default function CardPoup({ children, className, data }: CardPoupProps) {
       <div className={className} onClick={handleOpen}>
         {children}
       </div>
-
       {/* Modal */}
-      {open && (
-        <div
-          className={`fixed inset-0 z-50 flex items-center justify-center transition-colors duration-300 ${
-            show ? "bg-black/60" : "bg-transparent"
-          }`}
-          onClick={handleClose}
-        >
-          <div
-            className={`bg-white rounded-xl shadow-lg w-[90%] max-w-md p-6 relative flex flex-col gap-y-2 transform transition-all duration-300 ${
-              show ? "opacity-100 scale-100" : "opacity-0 scale-95"
-            }`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className="absolute top-3 right-3 text-black cursor-pointer font-bold text-xl z-10"
-              onClick={handleClose}
-            >
-              ✕
-            </button>
-            <div className="flex flex-col gap-y-2 max-h-[400px] overflow-auto">
-              <div className="relative w-full">
-                <SkeletonImage
-                  src={data.image}
-                  alt={data.title}
-                  className="cursor-pointer shrink-0 w-full max-h-[300px] aspect-video"
-                />
-              </div>
-              <CardTitle>{data.title}</CardTitle>
-              <div className="flex w-full">
-                {typeof data.subTitle === "object" && (
-                  <>
-                    <div className="flex w-1/2 items-center justify-start gap-2 text-dark-gray">
-                      <FaCalendarAlt />
-                      <span>{data.subTitle.date}</span>
-                    </div>
-                    <div className="flex w-1/2 items-center justify-start gap-2 text-dark-gray">
-                      <IconProfiles />
-                      <span>{data.subTitle.members} members</span>
-                    </div>
-                  </>
-                )}
-              </div>
-              <CardDesc className="text-black!">{data.desc}</CardDesc>
-            </div>
-            <div className="flex gap-3 justify-start">
-              <Button
-                disabled={data.action_name === "Already Registered"}
-                onClick={data.action}
-              >
-                {data.action_name}
-              </Button>
-            </div>
+      <Popup handleClose={handleClose} open={open} show={show}>
+        <div className="flex flex-col gap-y-2 max-h-[400px] overflow-auto">
+          <div className="relative w-full">
+            <SkeletonImage
+              src={data.image}
+              alt={data.title}
+              className="cursor-pointer shrink-0 w-full max-h-[300px] aspect-video"
+            />
           </div>
+          <CardTitle>{data.title}</CardTitle>
+          <div className="flex w-full">
+            {typeof data.subTitle === "object" && (
+              <>
+                <div className="flex w-1/2 items-center justify-start gap-2 text-dark-gray">
+                  <FaCalendarAlt />
+                  <CardDesc>{data.subTitle.date}</CardDesc>
+                </div>
+                <div className="flex w-1/2 items-center justify-start gap-2 text-dark-gray">
+                  <IconProfiles />
+                  <span>{data.subTitle.members}</span>
+                </div>
+              </>
+            )}
+          </div>
+          <CardDesc className="text-black!">{data.desc}</CardDesc>
         </div>
-      )}
+        <div className="flex gap-3 justify-start">
+          <Button
+            disabled={data.action_name === "Already Registered"}
+            onClick={data.action}
+          >
+            {data.action_name}
+          </Button>
+        </div>
+      </Popup>
     </>
   );
 }
