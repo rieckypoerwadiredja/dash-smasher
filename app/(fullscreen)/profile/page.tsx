@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { Event } from "@/app/(main)/events/page";
 import {
   mapBookToActivities,
+  mapBookToActivitiesActive,
   mapEventToActivities,
 } from "@/app/utils/mapers/historyMapers";
 import CardList from "@/app/components/fragments/CardList";
@@ -33,9 +34,10 @@ export default async function ProfilePage() {
   if (!session.user) redirect("/login");
 
   const history = await fetchData<History>(
-    `${API_BASE_URL}/api/sheets/history?email=${session.user.email}&limit=4`
+    `${API_BASE_URL}/api/sheets/history?email=${session.user.email}`
   );
   const bookHistory = [history].map(mapBookToActivities)[0];
+  const bookActive = [history].map(mapBookToActivitiesActive)[0];
   const eventHistory = [history].map(mapEventToActivities)[0];
 
   return (
@@ -70,11 +72,20 @@ export default async function ProfilePage() {
         </div>
       </div>
       <CardList
+        cards={bookActive}
+        title="Active Book"
+        status={{
+          title: "Oops, you haven't active books",
+          desc: "Book new court now",
+          status: "empty",
+        }}
+      />
+      <CardList
         cards={bookHistory}
         title="Book History"
         status={{
-          title: "Oops, event not found",
-          desc: "Try other keywords",
+          title: "you have never booked a court",
+          desc: "Let's make your first book!",
           status: "empty",
         }}
       />

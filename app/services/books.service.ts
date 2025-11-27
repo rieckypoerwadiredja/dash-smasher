@@ -40,7 +40,7 @@ export async function getBooks(email?: string) {
       status: row[8],
       total_price: row[9],
       payment_type: row[10],
-      check_in: row[11],
+      check_in: row[11] === "TRUE" ? true : false,
     }));
 
     return {
