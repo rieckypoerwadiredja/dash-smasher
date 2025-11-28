@@ -1,5 +1,6 @@
 import { getSheetsClient } from "@/app/utils/sheets";
 import { EventMember } from "../(main)/events/page";
+import { formatDateTime } from "../utils/date";
 
 const spreadsheetId = process.env.SPREADSHEET_ID!;
 
@@ -17,7 +18,7 @@ export async function getEventMember(email: string) {
 
     const sheets = await getSheetsClient();
 
-    const range = "event_member!A:D";
+    const range = "event_member!A:E";
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId,
       range,
@@ -56,6 +57,7 @@ export async function getEventMember(email: string) {
 export async function addEventMember(body: EventMember) {
   try {
     const { id, name, email, event_id } = body;
+    const created_at = formatDateTime();
 
     if (!id || !name || !email || !event_id) {
       return {
@@ -68,7 +70,7 @@ export async function addEventMember(body: EventMember) {
 
     const sheets = await getSheetsClient();
 
-    const range = "event_member!A:D";
+    const range = "event_member!A:E";
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId,
       range,
@@ -103,7 +105,7 @@ export async function addEventMember(body: EventMember) {
       range,
       valueInputOption: "RAW",
       requestBody: {
-        values: [[id, name, email, event_id]],
+        values: [[id, name, email, event_id, created_at]],
       },
     });
 
@@ -111,7 +113,7 @@ export async function addEventMember(body: EventMember) {
       success: true,
       status: 201,
       message: "Registered successfully",
-      data: { id, name, email, event_id },
+      data: { id, name, email, event_id, created_at },
     };
   } catch (error) {
     console.error("addEventMember error:", error);

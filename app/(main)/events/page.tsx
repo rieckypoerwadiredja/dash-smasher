@@ -22,6 +22,7 @@ export interface EventMember {
   name: string;
   email: string;
   event_id: string;
+  created_at: Date;
 }
 
 export default async function PageEvent() {

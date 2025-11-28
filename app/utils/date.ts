@@ -32,3 +32,22 @@ export function formatDateRange(start: Date, end: Date): string {
   // Kasus 3: Tahun beda → 30 Des 2025 - 2 Jan 2026
   return `${startDay} ${startMonth} ${startYear} - ${endDay} ${endMonth} ${endYear}`;
 }
+
+export function parseDMY(dateStr: string) {
+  const [day, month, year] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+export function formatDateTime() {
+  const now = new Date();
+
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const seconds = String(now.getSeconds()).padStart(2, "0");
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}

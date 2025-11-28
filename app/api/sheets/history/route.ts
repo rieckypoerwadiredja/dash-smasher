@@ -8,6 +8,12 @@ export async function GET(req: Request) {
     const limit = url.searchParams.get("limit") || undefined;
 
     const history = await getHistory(email, limit);
+    // !status "-" && payment_type = "-" NOT VALID
+    if (history.data?.books) {
+      history.data.books = history.data.books.filter(
+        (book) => book.status !== "-" && book.payment_type !== "-"
+      );
+    }
 
     return NextResponse.json(history, {
       status: history.status,

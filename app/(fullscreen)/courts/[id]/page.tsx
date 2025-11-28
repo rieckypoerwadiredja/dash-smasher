@@ -28,6 +28,9 @@ export interface Book {
   total_price: number;
   payment_type: string;
   check_in: boolean;
+  created_at: string;
+  updated_at: string;
+  check_in_at: string;
 }
 
 export default function Page() {
@@ -54,6 +57,9 @@ export default function Page() {
     total_price: 0,
     payment_type: "-", // value from midtrans
     check_in: false,
+    created_at: "",
+    updated_at: "",
+    check_in_at: "",
   });
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -358,6 +364,9 @@ export default function Page() {
         total_price: 0,
         payment_type: "-",
         check_in: false,
+        created_at: "",
+        updated_at: "",
+        check_in_at: "",
       });
     } catch (err: unknown) {
       if (err instanceof Error) {

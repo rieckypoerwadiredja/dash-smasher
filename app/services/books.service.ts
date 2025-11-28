@@ -1,4 +1,5 @@
 import { Book } from "../(fullscreen)/courts/[id]/page";
+import { formatDateTime } from "../utils/date";
 import { getSheetsClient } from "../utils/sheets";
 
 const spreadsheetId = process.env.SPREADSHEET_ID!;
@@ -9,7 +10,7 @@ export async function getBooks(email?: string) {
 
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: "books!A:L",
+      range: "books!A:O",
     });
 
     let rows = response.data.values || [];
@@ -41,6 +42,9 @@ export async function getBooks(email?: string) {
       total_price: row[9],
       payment_type: row[10],
       check_in: row[11] === "TRUE" ? true : false,
+      created_at: row[12],
+      updated_at: row[13],
+      check_in_at: row[14],
     }));
 
     return {
@@ -61,12 +65,51 @@ export async function getBooks(email?: string) {
   }
 }
 
+export async function getBookByCourtId(id: string): Promise<Book | null> {
+  try {
+    const sheets = await getSheetsClient();
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "books!A:O",
+    });
+
+    const rows = response.data.values || [];
+    if (!rows.length) return null;
+
+    const row = rows.find((r) => r[1] === id); // kolom A = id
+    if (!row) return null;
+
+    const book: Book = {
+      id: row[0],
+      court_id: row[1],
+      court_number: row[2],
+      user: row[3],
+      email: row[4],
+      start_time: row[5],
+      end_time: row[6],
+      date: row[7],
+      status: row[8],
+      total_price: row[9],
+      payment_type: row[10],
+      check_in: row[11]?.toUpperCase() === "TRUE",
+      created_at: row[12],
+      updated_at: row[13],
+      check_in_at: row[14],
+    };
+    console.log(book);
+    return book;
+  } catch (err) {
+    console.error("getBookById error:", err);
+    return null;
+  }
+}
+
 export async function getBookById(id: string): Promise<Book | null> {
   try {
     const sheets = await getSheetsClient();
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: "books!A:L",
+      range: "books!A:O",
     });
 
     const rows = response.data.values || [];
@@ -88,8 +131,11 @@ export async function getBookById(id: string): Promise<Book | null> {
       total_price: row[9],
       payment_type: row[10],
       check_in: row[11]?.toUpperCase() === "TRUE",
+      created_at: row[12],
+      updated_at: row[13],
+      check_in_at: row[14],
     };
-
+    console.log(book);
     return book;
   } catch (err) {
     console.error("getBookById error:", err);
@@ -104,7 +150,7 @@ export async function updateBookById(id: string, newData: Partial<Book>) {
     // Get all Books
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: "books!A:L",
+      range: "books!A:O",
     });
 
     const rows = response.data.values || [];
@@ -146,18 +192,23 @@ export async function updateBookById(id: string, newData: Partial<Book>) {
       total_price: oldRow[9],
       payment_type: oldRow[10],
       check_in: oldRow[11],
+      created_at: oldRow[12],
+      updated_at: oldRow[13],
+      check_in_at: oldRow[14],
     };
+    const updated_at = formatDateTime();
 
     // merge with new data
     const updated: Book = {
       ...oldData,
       ...newData, //  overwrite field from user
+      updated_at: updated_at,
     };
 
     // Update row to Google Sheet
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `books!A${rowIndex + 1}:L${rowIndex + 1}`, // row number (1-based)
+      range: `books!A${rowIndex + 1}:O${rowIndex + 1}`, // row number (1-based)
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [
@@ -174,6 +225,9 @@ export async function updateBookById(id: string, newData: Partial<Book>) {
             updated.total_price,
             updated.payment_type,
             updated.check_in,
+            updated.created_at,
+            updated.updated_at,
+            updated.check_in_at,
           ],
         ],
       },
@@ -200,25 +254,40 @@ export async function updateBookById(id: string, newData: Partial<Book>) {
 export async function addBook(data: Book) {
   try {
     const sheets = await getSheetsClient();
+
+    const created_at = formatDateTime();
+    const updated_at = "-";
+    const check_in_at = "-";
+
+    const payload = {
+      ...data,
+      created_at,
+      updated_at,
+      check_in_at,
+    };
+
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: "books!A:L",
+      range: "books!A:O",
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [
           [
-            data.id,
-            data.court_id,
-            data.court_number,
-            data.user,
-            data.email,
-            data.start_time,
-            data.end_time,
-            data.date,
-            data.status,
-            data.total_price,
-            data.payment_type,
-            data.check_in,
+            payload.id,
+            payload.court_id,
+            payload.court_number,
+            payload.user,
+            payload.email,
+            payload.start_time,
+            payload.end_time,
+            payload.date,
+            payload.status,
+            payload.total_price,
+            payload.payment_type,
+            payload.check_in,
+            payload.created_at,
+            payload.updated_at,
+            payload.check_in_at,
           ],
         ],
       },

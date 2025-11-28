@@ -1,4 +1,4 @@
-import { getBookById } from "@/app/services/books.service";
+import { getBookByCourtId } from "@/app/services/books.service";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -14,7 +14,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const booking = await getBookById(id);
+    const booking = await getBookByCourtId(id);
 
     return NextResponse.json({
       data: booking ? [booking] : [],
