@@ -11,6 +11,7 @@ interface CardListProps {
   limit?: boolean;
   filterComponent?: ReactNode;
   status: StatusProps;
+  minScreen?: boolean;
 }
 
 export default function CardList({
@@ -19,11 +20,12 @@ export default function CardList({
   limit = false,
   filterComponent,
   status,
+  minScreen = true,
 }: CardListProps) {
   const visibleCourts = limit ? cards.slice(-6) : cards;
 
   return (
-    <Section minScreen title={title}>
+    <Section minScreen={minScreen} title={title}>
       {filterComponent && (
         <div className="flex flex-wrap items-center gap-3 mb-6 text-sm">
           {filterComponent}

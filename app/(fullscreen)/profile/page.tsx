@@ -6,8 +6,9 @@ import { Book } from "../courts/[id]/page";
 import { redirect } from "next/navigation";
 import { Event } from "@/app/(main)/events/page";
 import {
-  mapBookToActivities,
+  mapBookToActivitiesHistory,
   mapBookToActivitiesActive,
+  mapBookToActivitiesPending,
   mapEventToActivities,
 } from "@/app/utils/mapers/historyMapers";
 import CardList from "@/app/components/fragments/CardList";
@@ -36,7 +37,8 @@ export default async function ProfilePage() {
   const history = await fetchData<History>(
     `${API_BASE_URL}/api/sheets/history?email=${session.user.email}`
   );
-  const bookHistory = [history].map(mapBookToActivities)[0];
+  const bookHistory = [history].map(mapBookToActivitiesHistory)[0];
+  const bookPaymentProgress = [history].map(mapBookToActivitiesPending)[0];
   const bookActive = [history].map(mapBookToActivitiesActive)[0];
   const eventHistory = [history].map(mapEventToActivities)[0];
 
@@ -71,7 +73,20 @@ export default async function ProfilePage() {
           <Paragraph className="font-semibold">{session.user.name}</Paragraph>
         </div>
       </div>
+      {bookPaymentProgress.length > 0 && (
+        <CardList
+          minScreen={false}
+          cards={bookPaymentProgress}
+          title="Payment Progress Book"
+          status={{
+            title: "Oops, you haven't active books",
+            desc: "Book new court now",
+            status: "empty",
+          }}
+        />
+      )}
       <CardList
+        minScreen={false}
         cards={bookActive}
         title="Active Book"
         status={{
@@ -81,6 +96,7 @@ export default async function ProfilePage() {
         }}
       />
       <CardList
+        minScreen={false}
         cards={bookHistory}
         title="Book History"
         status={{
@@ -90,6 +106,7 @@ export default async function ProfilePage() {
         }}
       />
       <CardList
+        minScreen={false}
         cards={eventHistory}
         title="Event History"
         status={{

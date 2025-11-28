@@ -15,9 +15,9 @@ export async function GET(request: Request) {
     }
 
     const booking = await getBookByCourtId(id);
-
+    console.log(booking);
     return NextResponse.json({
-      data: booking ? [booking] : [],
+      data: booking,
     });
   } catch (err) {
     console.error("GET /api/sheets/books/[id] error:", err);

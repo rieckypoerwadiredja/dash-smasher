@@ -65,7 +65,7 @@ export async function getBooks(email?: string) {
   }
 }
 
-export async function getBookByCourtId(id: string): Promise<Book | null> {
+export async function getBookByCourtId(id: string): Promise<Book[]> {
   try {
     const sheets = await getSheetsClient();
     const response = await sheets.spreadsheets.values.get({
@@ -74,12 +74,39 @@ export async function getBookByCourtId(id: string): Promise<Book | null> {
     });
 
     const rows = response.data.values || [];
-    if (!rows.length) return null;
+    if (rows.length === 0) return [];
 
-    const row = rows.find((r) => r[1] === id); // kolom A = id
-    if (!row) return null;
+    // FILTER RAW BY COURT ID
+    const filtered = rows.filter((r) => r[1] === id);
+    if (filtered.length === 0) return [];
 
-    const book: Book = {
+    // FILTER VALID BOOKING
+    const valid = filtered.filter((row) => {
+      const status = (row[8] || "").toLowerCase();
+      const payment = row[10] || "";
+
+      // status invalid
+      if (
+        status === "-" ||
+        status === "cancel" ||
+        status === "deny" ||
+        status === "expire"
+      ) {
+        return false;
+      }
+
+      // payment invalid
+      if (payment === "-") {
+        return false;
+      }
+
+      return true;
+    });
+
+    if (valid.length === 0) return [];
+
+    // MAP → convert row ke Book
+    const books: Book[] = valid.map((row) => ({
       id: row[0],
       court_id: row[1],
       court_number: row[2],
@@ -95,12 +122,12 @@ export async function getBookByCourtId(id: string): Promise<Book | null> {
       created_at: row[12],
       updated_at: row[13],
       check_in_at: row[14],
-    };
-    console.log(book);
-    return book;
+    }));
+
+    return books;
   } catch (err) {
-    console.error("getBookById error:", err);
-    return null;
+    console.error("getBookByCourtId error:", err);
+    return [];
   }
 }
 

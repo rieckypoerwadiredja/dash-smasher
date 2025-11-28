@@ -14,7 +14,13 @@ export async function PUT(request: Request) {
     const getBook = await getBookById(id);
     if (!getBook) throw new Error("Booking not found");
 
-    if (getBook.status === "-" || getBook.payment_type === "-")
+    if (
+      getBook.status === "-" ||
+      getBook.status === "cancel" ||
+      getBook.status === "deny" ||
+      getBook.status === "expire" ||
+      getBook.payment_type === "-"
+    )
       throw new Error("QR code has not valid payment");
 
     // Already checked in
