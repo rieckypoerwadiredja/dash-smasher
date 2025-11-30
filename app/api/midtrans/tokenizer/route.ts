@@ -40,6 +40,14 @@ export async function POST(request: Request) {
         date: body.date,
         total_price: body.total_price,
       },
+      page_expiry: {
+        duration: 1,
+        unit: "hours",
+      },
+      expiry: {
+        unit: "hours",
+        duration: 1,
+      },
     };
 
     // === CREATE TRANSACTION ===
