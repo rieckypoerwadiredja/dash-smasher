@@ -19,6 +19,7 @@ export async function PUT(request: Request) {
       getBook.status === "cancel" ||
       getBook.status === "deny" ||
       getBook.status === "expire" ||
+      getBook.status === "pending" ||
       getBook.payment_type === "-"
     )
       throw new Error("QR code has not valid payment");
