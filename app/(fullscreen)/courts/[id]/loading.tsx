@@ -3,6 +3,7 @@
 import { Slider } from "@/app/components/fragments/Slider";
 import { BookingFooterSkeleton } from "@/app/components/fragments/BookingFooter";
 import { DateSliderSkeleton } from "@/app/components/fragments/DateSlider";
+import { TimeSlotPickerSkeleton } from "@/app/components/fragments/TimeSlotPicker";
 
 export default function Loading() {
   return (
@@ -15,6 +16,9 @@ export default function Loading() {
         <Slider>
           <DateSliderSkeleton />
         </Slider>
+        <div className="w-full max-w-[800px] mx-auto flex flex-col gap-y-5">
+          <TimeSlotPickerSkeleton />
+        </div>
 
         <BookingFooterSkeleton />
       </div>

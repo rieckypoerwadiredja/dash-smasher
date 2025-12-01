@@ -2,7 +2,7 @@
 import React from "react";
 import Button from "../elements/Button";
 import { Court } from "@/app/(main)/courts/page";
-import { Book } from "@/app/(fullscreen)/courts/[id]/page";
+import { Book } from "./DetailCourtClientWrapper";
 
 export interface TimeSlotPickerProps {
   timeLabel?: string;
@@ -84,6 +84,38 @@ export default function TimeSlotPicker({
             </Button>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+export function TimeSlotPickerSkeleton() {
+  const items = Array.from({ length: 10 }, (_, i) => i);
+
+  return (
+    <div>
+      <label className="text-sm font-medium flex justify-between mb-2">
+        <span className="h-4 w-20 bg-gray-300 rounded animate-pulse"></span>
+      </label>
+
+      <div className="flex flex-wrap gap-3">
+        {items.map((idx) => (
+          <div
+            key={idx}
+            className="
+              bg-gray-300 
+              text-transparent 
+              rounded-lg 
+              p-2.5 
+              w-20 
+              h-10 
+              animate-pulse
+            "
+          >
+            {/* Text placeholder */}
+            <div className="h-3 w-10 bg-gray-400 rounded mx-auto"></div>
+          </div>
+        ))}
       </div>
     </div>
   );

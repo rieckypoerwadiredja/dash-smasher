@@ -26,16 +26,13 @@ export interface CardPoupProps {
 
 export default function CardPoup({ children, className, data }: CardPoupProps) {
   const [open, setOpen] = useState(false);
-  const [show, setShow] = useState(false);
 
   const handleOpen = () => {
     setOpen(true);
     // kasih delay dikit biar transition aktif (karena Tailwind butuh waktu 1 frame)
-    setTimeout(() => setShow(true), 10);
   };
 
   const handleClose = () => {
-    setShow(false);
     // kasih waktu 300ms buat animasi fade-out dulu baru remove elemen
     setTimeout(() => setOpen(false), 300);
   };
@@ -47,7 +44,7 @@ export default function CardPoup({ children, className, data }: CardPoupProps) {
         {children}
       </div>
       {/* Modal */}
-      <Popup handleClose={handleClose} open={open} show={show}>
+      <Popup handleClose={handleClose} open={open}>
         <div className="flex flex-col gap-y-2 max-h-[400px] overflow-auto">
           <div className="relative w-full">
             <SkeletonImage

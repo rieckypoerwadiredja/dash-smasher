@@ -1,4 +1,4 @@
-import { Book } from "../(fullscreen)/courts/[id]/page";
+import { Book } from "../components/fragments/DetailCourtClientWrapper";
 import { formatDateTime } from "../utils/date";
 import { getSheetsClient } from "../utils/sheets";
 
@@ -282,12 +282,17 @@ export async function addBook(data: Book) {
   try {
     const sheets = await getSheetsClient();
 
+    const [day, month, year] = data.date.split("-").map(Number);
+    const formattedDate = `${String(day).padStart(2, "0")}-${String(
+      month
+    ).padStart(2, "0")}-${year}`;
     const created_at = formatDateTime();
     const updated_at = "-";
     const check_in_at = "-";
 
     const payload = {
       ...data,
+      date: formattedDate,
       created_at,
       updated_at,
       check_in_at,

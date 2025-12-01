@@ -42,7 +42,10 @@ export default function Footer() {
           <Link href="#" className="text-dark-gray text-sm hover:underline">
             Help Center
           </Link>
-          <Link href="#" className="text-dark-gray text-sm hover:underline">
+          <Link
+            href="/terms-and-conditions"
+            className="text-dark-gray text-sm hover:underline"
+          >
             Terms of Service
           </Link>
           <Link href="#" className="text-dark-gray text-sm hover:underline">

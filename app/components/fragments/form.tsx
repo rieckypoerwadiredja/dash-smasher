@@ -1,5 +1,5 @@
 "use client";
-import { GeneralInput } from "../elements/Form";
+import { CheckboxInput, GeneralInput } from "../elements/Form";
 import Button, {
   GithubButton,
   GoogleButton,
@@ -10,8 +10,10 @@ import Link from "next/link";
 import SkeletonImage from "./SkeletonImage";
 import { signIn } from "next-auth/react";
 import { IMAGES } from "@/app/constants/image";
+import { useState } from "react";
 
 export default function LoginForm() {
+  const [agree, setAgree] = useState(false);
   return (
     <>
       <div className="flex min-h-full w-full md:w-fit mx-auto flex-col justify-center p-10 m-5 rounded-2xl lg:px-8 md:bg-white">
@@ -67,13 +69,32 @@ export default function LoginForm() {
             <div className="flex flex-col gap-y-3">
               {/* <Button className="w-full cursor-pointer">Sign in</Button> */}
               <GoogleButton
+                disabled={!agree}
                 onClick={() => signIn("google", { callbackUrl: "/" })}
               />
               <GithubButton
+                disabled={!agree}
                 onClick={() => signIn("github", { callbackUrl: "/" })}
               />
               <MicrosoftButton
+                disabled={!agree}
                 onClick={() => signIn("azure-ad", { callbackUrl: "/" })}
+              />
+              <CheckboxInput
+                checked={agree}
+                onChange={(e) => setAgree(e.target.checked)}
+                label={
+                  <>
+                    I agree with the{" "}
+                    <Link
+                      href="/terms-and-conditions"
+                      className="font-semibold text-primary hover:text-primary underline"
+                    >
+                      terms and conditions
+                    </Link>
+                    .
+                  </>
+                }
               />
             </div>
           </form>

@@ -40,17 +40,18 @@ export function mapBookToActivitiesPending(history: History): MainCardProps[] {
         )} | ${e.start_time} - ${e.end_time} | Court: ${
           e.court_number
         } | Check in: ${e.check_in ? "Done" : "Not Yet"}`,
-        action_name: "Waiting Payment",
-        action_popup: {
-          image: "",
-          title: "Payment Pending",
-          desc: "Your payment is still in progress. Please complete the payment to activate your booking.",
-          action_name: `${e.email}`,
-          subTitle: {
-            date: `${e.date} <br/> ${e.start_time} - ${e.end_time}`,
-            members: `ID: ${e.id}`,
-          },
-        },
+        // TODO Open virtual account
+        // action_name: "Waiting Payment",
+        // action_popup: {
+        //   image: "",
+        //   title: "Payment Pending",
+        //   desc: "Your payment is still in progress. Please complete the payment to activate your booking.",
+        //   action_name: `${e.email}`,
+        //   subTitle: {
+        //     date: `${e.date} <br/> ${e.start_time} - ${e.end_time}`,
+        //     members: `ID: ${e.id}`,
+        //   },
+        // },
       };
     });
 }

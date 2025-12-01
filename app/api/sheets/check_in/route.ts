@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
-    const { id, ...updateFields } = body;
+    const { id, clientTime, ...updateFields } = body;
 
     if (!id) throw new Error("ID is required");
 
@@ -26,11 +26,16 @@ export async function PUT(request: Request) {
     // Already checked in
     if (getBook.check_in) throw new Error("QR code has already been used");
 
-    const now = new Date();
-    const bookingDate = parseDMY(getBook.date);
+    if (!clientTime) throw new Error("Client time is required for check-in");
 
     // Compare only date
+    const now = clientTime && new Date(clientTime);
+    const [day, month, year] = getBook.date.split("-").map(Number);
+    const bookingDate = new Date(year, month - 1, day);
+
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    console.log(now);
+    console.log(today);
     const bookDay = new Date(
       bookingDate.getFullYear(),
       bookingDate.getMonth(),
@@ -50,11 +55,10 @@ export async function PUT(request: Request) {
 
     // TIME PARSE
     const [startHour, startMinute] = getBook.start_time.split(":").map(Number);
-    const [endHour, endMinute] = getBook.end_time.split(":").map(Number);
-
     const startTime = new Date(bookingDate);
     startTime.setHours(startHour, startMinute, 0, 0);
 
+    const [endHour, endMinute] = getBook.end_time.split(":").map(Number);
     const endTime = new Date(bookingDate);
     endTime.setHours(endHour, endMinute, 0, 0);
 

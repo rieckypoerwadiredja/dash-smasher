@@ -1,4 +1,4 @@
-import { Book } from "@/app/(fullscreen)/courts/[id]/page";
+import { Book } from "@/app/components/fragments/DetailCourtClientWrapper";
 import {
   addBook,
   getBooks,

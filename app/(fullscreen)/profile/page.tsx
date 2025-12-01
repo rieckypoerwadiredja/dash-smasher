@@ -2,7 +2,7 @@ import { Paragraph } from "@/app/components/elements/Text";
 import SkeletonImage from "@/app/components/fragments/SkeletonImage";
 import { API_BASE_URL, fetchData } from "@/app/utils/fetcher";
 import { protectedPage } from "@/app/utils/protectedPage";
-import { Book } from "../courts/[id]/page";
+import { Book } from "@/app/components/fragments/DetailCourtClientWrapper";
 import { redirect } from "next/navigation";
 import { Event } from "@/app/(main)/events/page";
 import {

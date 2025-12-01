@@ -33,24 +33,31 @@ export function formatDateRange(start: Date, end: Date): string {
   return `${startDay} ${startMonth} ${startYear} - ${endDay} ${endMonth} ${endYear}`;
 }
 
+export function nowJakarta() {
+  const now = new Date();
+  // Convert UTC → WIB
+  return new Date(now.getTime() + 7 * 60 * 60 * 1000);
+}
+
 export function parseDMY(dateStr: string) {
   const [day, month, year] = dateStr.split("-").map(Number);
-  return new Date(year, month - 1, day);
+  // Return tetap Date object, pakai default server time
+  return new Date(year, month - 1, day, 0, 0, 0);
 }
 
 export function formatDateTime() {
   const now = new Date();
 
-  // Convert Jakarta (UTC+7)
-  const wib = new Date(now.getTime() + 7 * 60 * 60 * 1000);
-
-  const year = wib.getFullYear();
-  const month = String(wib.getMonth() + 1).padStart(2, "0");
-  const day = String(wib.getDate()).padStart(2, "0");
-
-  const hours = String(wib.getHours()).padStart(2, "0");
-  const minutes = String(wib.getMinutes()).padStart(2, "0");
-  const seconds = String(wib.getSeconds()).padStart(2, "0");
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const seconds = String(now.getSeconds()).padStart(2, "0");
 
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+export function nowServer() {
+  return new Date();
 }

@@ -11,6 +11,11 @@ interface ButtonProps {
   disabled?: boolean;
 }
 
+interface AuthButton {
+  onClick?: () => void;
+  disabled?: boolean;
+}
+
 export default function Button({
   children,
   className,
@@ -51,16 +56,19 @@ export default function Button({
 
 import { FcGoogle } from "react-icons/fc";
 
-export function GoogleButton({ onClick }: { onClick?: () => void }) {
+export function GoogleButton({ onClick, disabled = false }: AuthButton) {
   return (
     <button
       type="button"
-      onClick={onClick}
-      className="flex items-center bg-white border border-gray-300  text-black! cursor-pointer duration-300 transition-all
-                 rounded-lg shadow-md px-6 py-2 text-sm font-medium 
-                  dark:text-white hover:bg-black/2 
-                 focus:outline-none 
-                 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+      disabled={disabled}
+      onClick={!disabled ? onClick : undefined}
+      className={`flex items-center border border-gray-300 rounded-lg shadow-md px-6 py-2 text-sm font-medium 
+        transition-all duration-300 
+        ${
+          disabled
+            ? "bg-gray-100cursor-not-allowed opacity-50"
+            : "bg-white text-black hover:bg-black/5 cursor-pointer"
+        }`}
     >
       <FcGoogle className="h-6 w-6 mr-2" />
       <span>Continue with Google</span>
@@ -70,16 +78,19 @@ export function GoogleButton({ onClick }: { onClick?: () => void }) {
 
 import { FaGithub } from "react-icons/fa";
 
-export function GithubButton({ onClick }: { onClick?: () => void }) {
+export function GithubButton({ onClick, disabled = false }: AuthButton) {
   return (
     <button
       type="button"
+      disabled={disabled}
       onClick={onClick}
-      className="flex items-center bg-white border border-gray-300 text-black! cursor-pointer duration-300 transition-all
-                 rounded-lg shadow-md px-6 py-2 text-sm font-medium 
-                 dark:text-white hover:bg-black/2
-                 focus:outline-none 
-                 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+      className={`flex items-center border border-gray-300 rounded-lg shadow-md px-6 py-2 text-sm font-medium 
+        transition-all duration-300 
+        ${
+          disabled
+            ? "bg-gray-100cursor-not-allowed opacity-50"
+            : "bg-white text-black hover:bg-black/5 cursor-pointer"
+        }`}
     >
       <FaGithub className="h-6 w-6 mr-2" />
       <span>Continue with Github</span>
@@ -89,16 +100,19 @@ export function GithubButton({ onClick }: { onClick?: () => void }) {
 
 import { TiVendorMicrosoft } from "react-icons/ti";
 
-export function MicrosoftButton({ onClick }: { onClick?: () => void }) {
+export function MicrosoftButton({ onClick, disabled = false }: AuthButton) {
   return (
     <button
+      disabled={disabled}
       type="button"
       onClick={onClick}
-      className="flex items-center bg-white border border-gray-300 text-black! cursor-pointer duration-300 transition-all
-                 rounded-lg shadow-md px-6 py-2 text-sm font-medium 
-                 dark:text-white hover:bg-black/2
-                 focus:outline-none 
-                 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+      className={`flex items-center border border-gray-300 rounded-lg shadow-md px-6 py-2 text-sm font-medium 
+        transition-all duration-300 
+        ${
+          disabled
+            ? "bg-gray-100cursor-not-allowed opacity-50"
+            : "bg-white text-black hover:bg-black/5 cursor-pointer"
+        }`}
     >
       <TiVendorMicrosoft className="h-6 w-6 mr-2 text-blue-500" />
       <span>Continue with Microsoft</span>

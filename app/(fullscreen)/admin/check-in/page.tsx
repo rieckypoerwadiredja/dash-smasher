@@ -16,11 +16,13 @@ export default function Page() {
     const code = JSON.parse(detectedCodes[0].rawValue);
 
     try {
+      const clientTime = new Date().toISOString();
       const res = await fetch(`${API_BASE_URL}/api/sheets/check_in`, {
         method: "PUT",
         body: JSON.stringify({
           id: code.id,
           check_in: true,
+          clientTime: clientTime,
         }),
         headers: { "Content-Type": "application/json" },
       });
