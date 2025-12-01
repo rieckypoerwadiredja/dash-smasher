@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { getBookById, updateBookById } from "@/app/services/books.service";
-import { formatDateTime, parseDMY } from "@/app/utils/date";
+import { formatDateTime } from "@/app/utils/date";
 import { NextResponse } from "next/server";
 
 export async function PUT(request: Request) {
@@ -28,44 +28,53 @@ export async function PUT(request: Request) {
 
     if (!clientTime) throw new Error("Client time is required for check-in");
 
-    // Compare only date
-    const now = clientTime && new Date(clientTime);
+    // Waktu client → WIB
+    const nowWIB = new Date(
+      new Date(clientTime).getTime() + 7 * 60 * 60 * 1000
+    );
+
+    // Booking date (as WIB)
     const [day, month, year] = getBook.date.split("-").map(Number);
     const bookingDate = new Date(year, month - 1, day);
 
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    console.log(now);
-    console.log(today);
-    const bookDay = new Date(
+    const todayWIB = new Date(
+      nowWIB.getFullYear(),
+      nowWIB.getMonth(),
+      nowWIB.getDate()
+    );
+
+    const bookDayWIB = new Date(
       bookingDate.getFullYear(),
       bookingDate.getMonth(),
       bookingDate.getDate()
     );
 
     // DATE CHECKS
-    if (bookDay > today) {
+    if (bookDayWIB > todayWIB)
       throw new Error(
         "This booking is not valid yet. The date has not arrived."
       );
-    }
 
-    if (bookDay < today) {
+    if (bookDayWIB < todayWIB)
       throw new Error("This booking is already expired.");
-    }
 
-    // TIME PARSE
+    // TIME PARSE (WIB)
     const [startHour, startMinute] = getBook.start_time.split(":").map(Number);
-    const startTime = new Date(bookingDate);
-    startTime.setHours(startHour, startMinute, 0, 0);
-
     const [endHour, endMinute] = getBook.end_time.split(":").map(Number);
-    const endTime = new Date(bookingDate);
-    endTime.setHours(endHour, endMinute, 0, 0);
 
-    // 10 minutes before check-in allowed
-    const tenMinutesBefore = new Date(startTime.getTime() - 10 * 60 * 1000);
+    const startTimeWIB = new Date(bookDayWIB);
+    startTimeWIB.setHours(startHour, startMinute, 0, 0);
 
-    if (now < tenMinutesBefore) {
+    const endTimeWIB = new Date(bookDayWIB);
+    endTimeWIB.setHours(endHour, endMinute, 0, 0);
+
+    // Allowed check-in time windows
+    const tenMinutesBefore = new Date(startTimeWIB.getTime() - 10 * 60 * 1000);
+    const fifteenMinutesBeforeEnd = new Date(
+      endTimeWIB.getTime() - 15 * 60 * 1000
+    );
+
+    if (nowWIB < tenMinutesBefore) {
       throw new Error(
         `You cannot check in yet. Please wait until ${tenMinutesBefore.toLocaleTimeString(
           [],
@@ -77,35 +86,14 @@ export async function PUT(request: Request) {
       );
     }
 
-    // Still early (between 10 mins before & start)
-    if (now < startTime) {
-      throw new Error(
-        `You can check in starting at ${tenMinutesBefore.toLocaleTimeString(
-          [],
-          {
-            hour: "2-digit",
-            minute: "2-digit",
-          }
-        )}.`
-      );
-    }
-
-    // Cannot check-in when less than 15 mins left before end
-    const fifteenMinutesBeforeEnd = new Date(
-      endTime.getTime() - 15 * 60 * 1000
-    );
-
-    if (now > fifteenMinutesBeforeEnd) {
+    if (nowWIB > fifteenMinutesBeforeEnd) {
       throw new Error(
         "Check-in is not allowed because less than 15 minutes remain before the session ends."
       );
     }
 
-    const check_in_at = formatDateTime();
-    const updatedPayload = {
-      ...updateFields,
-      check_in_at,
-    };
+    const check_in_at = formatDateTime(); // already WIB
+    const updatedPayload = { ...updateFields, check_in_at };
 
     const result = await updateBookById(id, updatedPayload);
     return NextResponse.json(result, { status: result.status });
