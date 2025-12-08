@@ -18,7 +18,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <body className="max-w-[1440px] mx-auto">
+    <>
       {/* Wrapper center */}
       <div className="px-5 p-10 flex items-center justify-center">
         <StatusMessage
@@ -31,6 +31,6 @@ export default function Error({
       </div>
 
       <NavMob />
-    </body>
+    </>
   );
 }

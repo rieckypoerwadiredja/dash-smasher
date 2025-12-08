@@ -12,18 +12,21 @@ export async function GET(request: Request) {
     //  error
     if (!result.success) {
       return NextResponse.json(
-        { error: result.message },
+        { message: result.message },
         { status: result.status }
       );
     }
 
     // Success
-    return NextResponse.json({ data: result.data }, { status: 200 });
+    return NextResponse.json(
+      { success: true, data: result.data },
+      { status: 200 }
+    );
   } catch (err) {
     console.error("API /courts/[id] error:", err);
 
     return NextResponse.json(
-      { error: "Failed to fetch court data" },
+      { message: "Failed to fetch court data" },
       { status: 500 }
     );
   }

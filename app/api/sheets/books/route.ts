@@ -88,8 +88,10 @@ export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
     const email = url.searchParams.get("email") ?? undefined;
+    const courtIDsParam = url.searchParams.get("courtIDs") ?? "";
+    const courtIDs = courtIDsParam.split(",");
 
-    const result = await getBooks(email);
+    const result = await getBooks(email, courtIDs);
 
     return NextResponse.json(result, { status: result.status });
   } catch (err) {

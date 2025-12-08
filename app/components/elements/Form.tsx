@@ -13,6 +13,7 @@ interface GeneralInputProps {
   onChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => void;
+  id?: string;
   value: string | number;
   placeholder?: string;
   type?: "text" | "number" | "email" | "password" | "date" | "time" | "search";
@@ -76,6 +77,7 @@ export function SelectInputSkeleton({ className = "" }) {
 }
 
 export function GeneralInput({
+  id,
   onChange,
   value,
   placeholder,
@@ -90,6 +92,7 @@ export function GeneralInput({
       )}
       <div className="mt-2">
         <input
+          id={id}
           type={type}
           placeholder={placeholder}
           value={value}

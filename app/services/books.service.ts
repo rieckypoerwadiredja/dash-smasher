@@ -1,10 +1,11 @@
 import { Book } from "../components/fragments/DetailCourtClientWrapper";
+import { APIResponse } from "../types/apiResponse";
 import { formatDateTime } from "../utils/date";
 import { getSheetsClient } from "../utils/sheets";
 
 const spreadsheetId = process.env.SPREADSHEET_ID!;
 
-export async function getBooks(email?: string) {
+export async function getBooks(email?: string, courtIDs?: Array<string>) {
   try {
     const sheets = await getSheetsClient();
 
@@ -27,6 +28,11 @@ export async function getBooks(email?: string) {
     // filter by email
     if (email) {
       rows = rows.filter((r) => r[4] === email);
+    }
+
+    // filter by courtIDs list (if admin have > 1 court)
+    if (courtIDs) {
+      rows = rows.filter((r) => courtIDs.includes(r[1]));
     }
 
     const data: Book[] = rows.map((row) => ({
@@ -65,45 +71,95 @@ export async function getBooks(email?: string) {
   }
 }
 
-export async function getBookByCourtId(id: string): Promise<Book[]> {
+export async function getBookByCourtId(
+  id: string,
+  paymentStatus: Array<string> | undefined,
+  paymentType: "valid" | "not valid" | string | null,
+  admins?: Array<string>
+): Promise<APIResponse> {
   try {
     const sheets = await getSheetsClient();
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
       range: "books!A:O",
     });
+    let rows = response.data.values || [];
+    if (rows.length === 0)
+      return {
+        success: false,
+        status: 500,
+        message: `No bookings were found for courtId: ${id}.`,
+        data: [],
+      };
 
-    const rows = response.data.values || [];
-    if (rows.length === 0) return [];
+    // only bookings whose court_id = the id (court id user input) from user
+    rows = rows.filter((r) => r[1] === id);
+    if (rows.length === 0)
+      return {
+        success: false,
+        status: 500,
+        message: `No bookings were found for courtId: ${id}.`,
+        data: null,
+      };
 
-    // FILTER RAW BY COURT ID
-    const filtered = rows.filter((r) => r[1] === id);
-    if (filtered.length === 0) return [];
-
-    // FILTER VALID BOOKING
-    const valid = filtered.filter((row) => {
+    // FILTER VALID BOOKING + paymentType + paymentStatus
+    const valid = rows.filter((row) => {
       const status = (row[8] || "").toLowerCase();
       const payment = row[10] || "";
 
-      // status invalid
-      if (
-        status === "-" ||
-        status === "cancel" ||
-        status === "deny" ||
-        status === "expire"
-      ) {
-        return false;
-      }
+      // paymentType "-" === NOT VALID
+      if (paymentType === "valid" && payment === "-") return false;
+      if (paymentType === "not valid" && payment !== "-") return false;
 
-      // payment invalid
-      if (payment === "-") {
+      // only paymentStatus from user input
+      if (
+        paymentStatus &&
+        !paymentStatus.map((s) => s.toLowerCase()).includes(status)
+      ) {
         return false;
       }
 
       return true;
     });
 
-    if (valid.length === 0) return [];
+    if (admins) {
+      const adminEmail = admins[0];
+      const courtSheet = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: "courts!A:M",
+      });
+
+      const courtRows = courtSheet.data.values || [];
+
+      // filter courts where admin list includes adminEmail
+      const allowedCourtIDs = courtRows
+        .filter((c) => {
+          const adminList = c[12].split(",").map((e: string) => e.trim());
+          return adminList.includes(adminEmail);
+        })
+        .map((c) => c[0]); // c[0] = court_id
+
+      // lalu filter books berdasarkan court_ids yg boleh
+      rows = rows.filter((b) => allowedCourtIDs.includes(b[1]));
+      if (allowedCourtIDs.length === 0) {
+        return {
+          success: false,
+          status: 500,
+          message:
+            "You do not have permission to access any courts associated with this admin account.",
+          data: null,
+        };
+      }
+    }
+
+    if (valid.length === 0)
+      return {
+        success: false,
+        status: 500,
+        message:
+          "You do not have permission to access any courts associated with this admin account.",
+        data: [],
+      };
 
     // MAP → convert row ke Book
     const books: Book[] = valid.map((row) => ({
@@ -124,10 +180,21 @@ export async function getBookByCourtId(id: string): Promise<Book[]> {
       check_in_at: row[14],
     }));
 
-    return books;
-  } catch (err) {
+    return {
+      success: true,
+      status: 200,
+      message: "Bookings fetched successfully",
+      data: books,
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
     console.error("getBookByCourtId error:", err);
-    return [];
+    return {
+      success: false,
+      status: 500,
+      message: err.message,
+      data: null,
+    };
   }
 }
 

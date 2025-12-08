@@ -17,12 +17,16 @@ export default function Page() {
 
     try {
       const clientTime = new Date().toISOString();
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      alert(clientTime.toString());
+      alert(timezone);
       const res = await fetch(`${API_BASE_URL}/api/sheets/check_in`, {
         method: "PUT",
         body: JSON.stringify({
           id: code.id,
           check_in: true,
-          clientTime: clientTime,
+          clientTime,
+          timezone,
         }),
         headers: { "Content-Type": "application/json" },
       });

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import "../../../globals.css";
-import { NavMob } from "@/app/components/fragments/Nav";
+import "../../globals.css";
+import SessionWrapper from "@/app/components/elements/SessionWrapper";
 import { IMAGES } from "@/app/constants/image";
 
 export const metadata: Metadata = {
@@ -19,9 +19,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
-      {children}
-      <NavMob />
-    </>
+    <SessionWrapper>
+      <div className="px-5 md:px-10">{children}</div>
+    </SessionWrapper>
   );
 }

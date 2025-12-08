@@ -1,56 +1,57 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { getBookById, updateBookById } from "@/app/services/books.service";
-import { formatDateTime } from "@/app/utils/date";
+import { formatDateTime, formatToWIB } from "@/app/utils/date";
 import { NextResponse } from "next/server";
 
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
-    const { id, clientTime, ...updateFields } = body;
+    const { id, clientTime, timezone, ...updateFields } = body;
 
     if (!id) throw new Error("ID is required");
 
-    const getBook = await getBookById(id);
-    if (!getBook) throw new Error("Booking not found");
+    const booking = await getBookById(id);
+    if (!booking) throw new Error("Booking not found");
 
+    // INVALID PAYMENT OR STATUS
+    const invalidStatus = ["-", "cancel", "deny", "expire", "pending"];
     if (
-      getBook.status === "-" ||
-      getBook.status === "cancel" ||
-      getBook.status === "deny" ||
-      getBook.status === "expire" ||
-      getBook.status === "pending" ||
-      getBook.payment_type === "-"
-    )
+      invalidStatus.includes(booking.status) ||
+      booking.payment_type === "-"
+    ) {
       throw new Error("QR code has not valid payment");
+    }
 
-    // Already checked in
-    if (getBook.check_in) throw new Error("QR code has already been used");
+    // Already used
+    if (booking.check_in) throw new Error("QR code has already been used");
 
-    if (!clientTime) throw new Error("Client time is required for check-in");
+    if (!clientTime) throw new Error("Client time is required");
 
-    // Waktu client → WIB
-    const nowWIB = new Date(
-      new Date(clientTime).getTime() + 7 * 60 * 60 * 1000
-    );
+    // GET USER TIMEZONE (fallback: UTC)
+    const userTZ = timezone || "UTC"; // kamu dapat timezone dari FE (Intl.DateTimeFormat().resolvedOptions().timeZone)
 
-    // Booking date (as WIB)
-    const [day, month, year] = getBook.date.split("-").map(Number);
+    // Convert client time → WIB
+    const userDate = new Date(clientTime);
+    const nowWIB = formatToWIB(userDate, userTZ); // fungsi helper
+
+    // Parse booking date (D-M-Y)
+    const [day, month, year] = booking.date.split("-").map(Number);
     const bookingDate = new Date(year, month - 1, day);
 
+    // Normalize to WIB (compare date only)
     const todayWIB = new Date(
       nowWIB.getFullYear(),
       nowWIB.getMonth(),
       nowWIB.getDate()
     );
-
     const bookDayWIB = new Date(
       bookingDate.getFullYear(),
       bookingDate.getMonth(),
       bookingDate.getDate()
     );
 
-    // DATE CHECKS
+    // DATE VALIDATION
     if (bookDayWIB > todayWIB)
       throw new Error(
         "This booking is not valid yet. The date has not arrived."
@@ -59,21 +60,18 @@ export async function PUT(request: Request) {
     if (bookDayWIB < todayWIB)
       throw new Error("This booking is already expired.");
 
-    // TIME PARSE (WIB)
-    const [startHour, startMinute] = getBook.start_time.split(":").map(Number);
-    const [endHour, endMinute] = getBook.end_time.split(":").map(Number);
+    // TIME WINDOW VALIDATION
+    const [startHour, startMinute] = booking.start_time.split(":").map(Number);
+    const [endHour, endMinute] = booking.end_time.split(":").map(Number);
 
-    const startTimeWIB = new Date(bookDayWIB);
-    startTimeWIB.setHours(startHour, startMinute, 0, 0);
+    const startTime = new Date(bookDayWIB);
+    startTime.setHours(startHour, startMinute, 0, 0);
 
-    const endTimeWIB = new Date(bookDayWIB);
-    endTimeWIB.setHours(endHour, endMinute, 0, 0);
+    const endTime = new Date(bookDayWIB);
+    endTime.setHours(endHour, endMinute, 0, 0);
 
-    // Allowed check-in time windows
-    const tenMinutesBefore = new Date(startTimeWIB.getTime() - 10 * 60 * 1000);
-    const fifteenMinutesBeforeEnd = new Date(
-      endTimeWIB.getTime() - 15 * 60 * 1000
-    );
+    const tenMinutesBefore = new Date(startTime.getTime() - 10 * 60000);
+    const fifteenMinutesBeforeEnd = new Date(endTime.getTime() - 15 * 60000);
 
     if (nowWIB < tenMinutesBefore) {
       throw new Error(
@@ -93,10 +91,11 @@ export async function PUT(request: Request) {
       );
     }
 
+    // FINAL UPDATE
     const check_in_at = formatDateTime(); // already WIB
-    const updatedPayload = { ...updateFields, check_in_at };
+    const payload = { ...updateFields, check_in_at };
 
-    const result = await updateBookById(id, updatedPayload);
+    const result = await updateBookById(id, payload);
     return NextResponse.json(result, { status: result.status });
   } catch (error: any) {
     console.error("PUT /books error:", error);

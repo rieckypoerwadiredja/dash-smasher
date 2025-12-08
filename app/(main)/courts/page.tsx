@@ -16,6 +16,7 @@ export interface Court {
   court_count: number;
   price_per_hour: number;
 }
+
 export const dynamic = "force-dynamic";
 export default async function CourtsPage() {
   const courts = await fetchData<Court[]>(`${API_BASE_URL}/api/sheets/courts`);

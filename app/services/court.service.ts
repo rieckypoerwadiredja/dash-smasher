@@ -38,7 +38,7 @@ export async function getCourt(id: string) {
     if (!found) {
       return {
         status: 404,
-        message: "Data not found",
+        message: "No court data found, check your court id",
         data: null,
       };
     }
@@ -61,12 +61,12 @@ export async function getCourt(id: string) {
   }
 }
 
-export async function getCourts() {
+export async function getCourts(adminEmail: string | undefined) {
   try {
     const sheets = await getSheetsClient();
     const spreadsheetId = process.env.SPREADSHEET_ID!;
 
-    const range = "courts!A:L";
+    const range = "courts!A:M";
 
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId,
@@ -74,8 +74,18 @@ export async function getCourts() {
     });
 
     const rows = res.data.values || [];
+    const [header, ...dataRows] = rows;
 
-    if (rows.length === 0) {
+    let filteredRows = dataRows;
+
+    if (adminEmail) {
+      filteredRows = dataRows.filter((r) => {
+        const admins = r[12] ? r[12].split(",") : [];
+        return admins.includes(adminEmail);
+      });
+    }
+
+    if (filteredRows.length === 0) {
       return {
         success: false,
         status: 404,
@@ -84,9 +94,7 @@ export async function getCourts() {
       };
     }
 
-    const [header, ...dataRows] = rows;
-
-    const data = dataRows.map((row) => {
+    const data = filteredRows.map((row) => {
       const obj: Record<string, string> = {};
       header.forEach((key, i) => {
         obj[key] = row[i] || "";
