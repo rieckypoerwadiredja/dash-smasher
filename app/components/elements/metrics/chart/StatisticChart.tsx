@@ -24,47 +24,87 @@ export default function StatisticsChart({ data }: StatisticsChartProps) {
   const filteredData = useMemo(() => {
     const now = new Date();
     const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth(); // 0-based
 
     const result = {
       categories: [] as string[],
       series: data.series.map((s) => ({ name: s.name, data: [] as number[] })),
     };
 
+    // parsing data asli
     const parsed = data.categories.map((cat, idx) => ({
       date: new Date(cat.split("-").reverse().join("-")), // dd-mm-yyyy → Date
       values: data.series.map((s) => s.data[idx]),
     }));
 
     const grouped: Record<string, number[]> = {};
+    const seriesCount = data.series.length;
 
-    parsed.forEach((item) => {
-      let key = "";
-
-      switch (period) {
-        case "daily":
-          key = catFormat(item.date); // tetap per tanggal
-          break;
-        case "monthly":
-          if (item.date.getFullYear() !== currentYear) return;
-          key = `${item.date.getFullYear()}-${(item.date.getMonth() + 1)
-            .toString()
-            .padStart(2, "0")}`;
-          break;
-        case "quarterly":
-          if (item.date.getFullYear() !== currentYear) return;
-          const quarter = Math.floor(item.date.getMonth() / 3) + 1;
-          key = `Q${quarter}`;
-          break;
-        case "yearly":
-          key = `${item.date.getFullYear()}`;
-          break;
+    if (period === "daily") {
+      // generate semua tanggal bulan saat ini
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      for (let d = 1; d <= daysInMonth; d++) {
+        const key = catFormat(new Date(currentYear, currentMonth, d));
+        grouped[key] = Array(seriesCount).fill(0);
       }
+      parsed.forEach((item) => {
+        if (
+          item.date.getFullYear() !== currentYear ||
+          item.date.getMonth() !== currentMonth
+        )
+          return;
+        const key = catFormat(item.date);
+        item.values.forEach((v, i) => (grouped[key][i] += v));
+      });
+    } else if (period === "monthly") {
+      // generate 12 bulan tahun ini
+      for (let m = 0; m < 12; m++) {
+        const key = `${currentYear}-${String(m + 1).padStart(2, "0")}`;
+        grouped[key] = Array(seriesCount).fill(0);
+      }
+      parsed.forEach((item) => {
+        if (item.date.getFullYear() !== currentYear) return;
+        const key = `${currentYear}-${String(item.date.getMonth() + 1).padStart(
+          2,
+          "0"
+        )}`;
+        item.values.forEach((v, i) => (grouped[key][i] += v));
+      });
+    } else if (period === "quarterly") {
+      // generate Q1-Q4 tahun ini
+      for (let q = 1; q <= 4; q++) {
+        const key = `Q${q}`;
+        grouped[key] = Array(seriesCount).fill(0);
+      }
+      parsed.forEach((item) => {
+        if (item.date.getFullYear() !== currentYear) return;
+        const quarter = Math.floor(item.date.getMonth() / 3) + 1;
+        const key = `Q${quarter}`;
+        item.values.forEach((v, i) => (grouped[key][i] += v));
+      });
+    } else if (period === "yearly") {
+      parsed.forEach((item) => {
+        const key = `${item.date.getFullYear()}`;
+        if (!grouped[key]) grouped[key] = Array(seriesCount).fill(0);
+        item.values.forEach((v, i) => (grouped[key][i] += v));
+      });
+    }
 
-      if (!grouped[key]) grouped[key] = Array(item.values.length).fill(0);
-      item.values.forEach((v, i) => (grouped[key][i] += v));
+    // assign ke result
+    result.categories = Object.keys(grouped).sort((a, b) => {
+      if (period === "daily") {
+        const [d1, m1, y1] = a.split("-").map(Number);
+        const [d2, m2, y2] = b.split("-").map(Number);
+        return (
+          new Date(y1, m1 - 1, d1).getTime() -
+          new Date(y2, m2 - 1, d2).getTime()
+        );
+      }
+      if (period === "monthly") return a.localeCompare(b);
+      if (period === "quarterly") return a.localeCompare(b);
+      return Number(a) - Number(b);
     });
 
-    result.categories = Object.keys(grouped).sort();
     result.series.forEach((s, i) => {
       s.data = result.categories.map((cat) => grouped[cat][i]);
     });
