@@ -1,7 +1,8 @@
 import { Session } from "next-auth";
 import generateId from "./generateId";
+import { APIError, APIResponse } from "../types/apiResponse";
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
 export async function fetchData<T>(
   url: string,
@@ -24,26 +25,28 @@ export async function fetchData<T>(
     fetchOptions.body = JSON.stringify(options.body);
   }
 
-  const res = await fetch(url, fetchOptions);
 
-  // Ambil response JSON dulu
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let data: any;
-  try {
-    data = await res.json();
-  } catch {
-    data = null;
+  if (!url.startsWith(API_BASE_URL)) {
+    throw new Error("Invalid URL");
   }
 
-  // Kalau status bukan 2xx, lempar Error dengan message dari server
-  if (!res.ok) {
-    const msg =
-      (data && data.message) ||
-      `Server returned status ${res.status} ${res.statusText}`;
-    throw new Error(msg);
+  if (!API_BASE_URL) {
+    throw new Error("API_BASE_URL is not defined");
   }
 
-  return (data.data || data) as T;
+  
+ const res = await fetch(url, fetchOptions);
+
+  // parse JSON
+  const json: APIResponse<T> = await res.json();
+console.log(json)
+  // handle error format from API
+  if (!json.success) {
+    throw new Error(json.message || "Request failed");
+  }
+
+  return json.data as T;
+
 }
 
 export async function handleJoin(

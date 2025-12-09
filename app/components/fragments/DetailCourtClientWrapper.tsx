@@ -40,8 +40,8 @@ export default function DetailCourtClientWrapper({
   courtData,
   booksData,
 }: {
-  courtData: Court;
-  booksData: Book[];
+courtData: Court;
+booksData: Book[];
 }) {
   const router = useRouter();
   const { data: session } = useSession();

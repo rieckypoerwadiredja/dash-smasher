@@ -28,8 +28,6 @@ export interface History {
   events: HistoryEvent[];
 }
 
-// update section
-// unpaid (paling atas), paid, hostory dlu (exp cek jam mulai sm selesai + tgl hari book)
 export default async function ProfilePage() {
   const session = await protectedPage();
   if (!session.user) redirect("/login");

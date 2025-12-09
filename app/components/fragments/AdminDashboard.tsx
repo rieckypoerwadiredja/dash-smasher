@@ -9,6 +9,13 @@ import { FaCircleCheck } from "react-icons/fa6";
 import { IMAGES } from "@/app/constants/image";
 import { Book } from "./DetailCourtClientWrapper";
 import { Court } from "@/app/(main)/courts/page";
+import { IoAlertCircle } from "react-icons/io5";
+import {
+  mapBookingsToMetricsAdmin,
+  mapBooksToAlerts,
+  mapBookToCourtTimeline,
+} from "@/app/utils/mapers/dashboardMapers";
+import Button from "../elements/Button";
 
 interface CourtTimelineProps {
   courts: number[];
@@ -220,30 +227,9 @@ function AdminDashboard({
 
   const todayBookings = bookData.filter((b) => b.date === today);
 
-  const metrics = [
-    {
-      title: "Total Booking Today",
-      value: todayBookings.length.toString(),
-      icon: <FaCalendarAlt className="text-info text-xl" />,
-    },
-    {
-      title: "Court in Use",
-      value: todayBookings.filter((b) => b.check_in).length.toString(),
-      icon: <FaHourglassStart className="text-warn text-xl" />,
-    },
-    {
-      title: "Pending Check-In",
-      value: todayBookings.filter((b) => !b.check_in).length.toString(),
-      icon: <FaCircleCheck className="text-success text-xl" />,
-    },
-  ];
+  const metrics = mapBookingsToMetricsAdmin(todayBookings);
 
-  const alerts = todayBookings
-    .filter((b) => !b.check_in)
-    .map((b) => ({
-      id: b.id,
-      message: `Court ${b.court_number} waiting check-in (${b.user})`,
-    }));
+  const alerts = mapBooksToAlerts(todayBookings);
 
   return (
     <div className="p-6 flex flex-col gap-8">
@@ -258,7 +244,13 @@ function AdminDashboard({
       {/* METRICS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {metrics.map((m, i) => (
-          <MetricCard key={i} title={m.title} value={m.value} icon={m.icon} />
+          <MetricCard
+            key={i}
+            title={m.title}
+            value={m.value}
+            icon={m.icon}
+            badge={m.badge}
+          />
         ))}
       </div>
 
@@ -277,54 +269,13 @@ function AdminDashboard({
         <div className="lg:col-span-3 grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-4">
           {Array.from({ length: courtData.court_count }, (_, i) => i + 1).map(
             (courtNumber) => {
-              const courtBookings = todayBookings
-                .filter((b) => Number(b.court_number) === courtNumber)
-                .sort(
-                  (a, b) =>
-                    Number(a.start_time.replace(":", "")) -
-                    Number(b.start_time.replace(":", ""))
-                );
-
-              const parseTime = (timeStr: string) => {
-                const [h, m] = timeStr.split(":").map(Number);
-                const d = new Date(now);
-                d.setHours(h, m, 0, 0);
-                return d;
-              };
-
-              const active = courtBookings.find((b) => {
-                const start = parseTime(b.start_time);
-                const end = parseTime(b.end_time);
-                return now >= start && now <= end;
-              });
-
-              const upcoming = courtBookings
-                .filter((b) => now < parseTime(b.start_time))
-                .sort(
-                  (a, b) =>
-                    parseTime(a.start_time).getTime() -
-                    parseTime(b.start_time).getTime()
-                )[0];
-
-              let status = "Available";
-              let user = "-";
-              let startTime = "-";
-              let endTime = "-";
-
-              if (active) {
-                status = active.check_in ? "Ongoing" : "Waiting Check-In";
-                user = active.user;
-                startTime = active.start_time.slice(0, 5);
-                endTime = active.end_time.slice(0, 5);
-              } else if (upcoming) {
-                status = "Upcoming";
-                user = upcoming.user;
-                startTime = upcoming.start_time.slice(0, 5);
-                endTime = upcoming.end_time.slice(0, 5);
-              } else {
-                startTime = courtData.open_time;
-                endTime = courtData.close_time;
-              }
+              const courtStatus = mapBookToCourtTimeline(
+                courtNumber,
+                todayBookings,
+                now,
+                courtData.open_time,
+                courtData.close_time
+              );
 
               return (
                 <div key={courtNumber} className="flex flex-col">
@@ -337,11 +288,13 @@ function AdminDashboard({
                   />
 
                   <div className="mt-2 text-sm text-center">
-                    <p className="font-semibold">Court {courtNumber}</p>
-                    <p>{status}</p>
-                    <p className="text-gray-600">{user}</p>
+                    <p className="font-semibold">
+                      Court {courtStatus.courtNumber}
+                    </p>
+                    <p>{courtStatus.status}</p>
+                    <p className="text-gray-600">{courtStatus.user}</p>
                     <p className="text-gray-600">
-                      {startTime} - {endTime}
+                      {courtStatus.startTime} - {courtStatus.endTime}
                     </p>
                   </div>
                 </div>

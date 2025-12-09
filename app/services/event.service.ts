@@ -1,7 +1,8 @@
+import { APIError, APIResponse } from "../types/apiResponse";
 import { getSheetsClient } from "../utils/sheets";
 const spreadsheetId = process.env.SPREADSHEET_ID;
 
-export async function getEvents() {
+export async function getEvents(): Promise<APIResponse> {
   try {
     const sheets = await getSheetsClient();
     const range = "events!A:I";
@@ -17,7 +18,8 @@ export async function getEvents() {
       return {
         success: true,
         status: 200,
-        data: [],
+        message: "No events found",
+        data: null,
       };
     }
 
@@ -34,6 +36,7 @@ export async function getEvents() {
     return {
       success: true,
       status: 200,
+      message: "Events fetched successfully",
       data,
     };
   } catch (error) {
@@ -41,12 +44,12 @@ export async function getEvents() {
       success: false,
       status: 500,
       message: error instanceof Error ? error.message : "Unknown error",
-      data: [],
+      data: null,
     };
   }
 }
 
-export async function getEvent(id: string) {
+export async function getEvent(id: string): Promise<APIResponse> {
   try {
     const sheets = await getSheetsClient();
     const range = "events!A:I";
@@ -89,6 +92,7 @@ export async function getEvent(id: string) {
     return {
       success: true,
       status: 200,
+      message: "Event fetched successfully",
       data: found,
     };
   } catch (error) {

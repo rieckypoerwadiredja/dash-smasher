@@ -1,13 +1,16 @@
 import { Court } from "@/app/(main)/courts/page";
 import { Book } from "@/app/components/fragments/DetailCourtClientWrapper";
 
-import { FaCalendarAlt, FaClock } from "react-icons/fa";
+import { FaCalendarAlt, FaClock, FaHourglassStart } from "react-icons/fa";
 import { formatPrice } from "../currency";
 import { AiFillDollarCircle } from "react-icons/ai";
 import { FaCircleCheck } from "react-icons/fa6";
 import { IoAlertCircle } from "react-icons/io5";
 
-export function mapBookingsToMetrics(books: Book[]) {
+// -------------------
+// OWNER
+// -------------------
+export function mapBookingsToMetricsOwner(books: Book[]) {
   const totalBookings = books.length;
 
   const revenueCollected = books
@@ -210,4 +213,112 @@ export function mapBooksToHeatmap(books: Book[], courts: Court[]) {
   });
 
   return { heatmap, slots };
+}
+
+// ------------
+// ADMIN
+// ------------
+
+export function mapBookingsToMetricsAdmin(todayBookings: Book[]) {
+  const totalBookings = todayBookings.length;
+  const checkIns = todayBookings.filter((b) => b.check_in).length;
+  const pendingCheckIn = todayBookings.filter((b) => !b.check_in).length;
+  const expireCheckIn = todayBookings.filter(
+    (b) => b.status === "expire"
+  ).length;
+
+  const metrics = [
+    {
+      key: "totalBookings",
+      title: "Total Booking Today",
+      value: String(totalBookings),
+      icon: <FaCalendarAlt className="text-info text-2xl" />,
+      badge: false,
+    },
+    {
+      key: "courtInUse",
+      title: "Court in Use",
+      value: String(checkIns),
+      icon: <FaHourglassStart className="text-warn text-2xl" />,
+      badge: false,
+    },
+    {
+      key: "pendingCheckIn",
+      title: "Pending Check-In",
+      value: String(pendingCheckIn),
+      icon: <FaCircleCheck className="text-success text-2xl" />,
+      badge: false,
+    },
+    {
+      key: "expireCheckIn",
+      title: "Expire Check-In",
+      value: String(expireCheckIn),
+      icon: <IoAlertCircle className="text-failed text-2xl" />,
+      badge: false,
+    },
+  ];
+
+  return metrics;
+}
+
+export interface CourtStatus {
+  courtNumber: number;
+  status: string;
+  user: string;
+  startTime: string;
+  endTime: string;
+}
+
+export function mapBookToCourtTimeline(
+  courtNumber: number,
+  bookings: Book[],
+  now: Date,
+  openTime: string,
+  closeTime: string
+): CourtStatus {
+  const parseTime = (timeStr: string) => {
+    const [h, m] = timeStr.split(":").map(Number);
+    const d = new Date(now);
+    d.setHours(h, m, 0, 0);
+    return d;
+  };
+
+  const courtBookings = bookings
+    .filter((b) => Number(b.court_number) === courtNumber)
+    .sort(
+      (a, b) =>
+        parseTime(a.start_time).getTime() - parseTime(b.start_time).getTime()
+    );
+
+  const active = courtBookings.find((b) => {
+    const start = parseTime(b.start_time);
+    const end = parseTime(b.end_time);
+    return now >= start && now <= end;
+  });
+
+  const upcoming = courtBookings
+    .filter((b) => now < parseTime(b.start_time))
+    .sort(
+      (a, b) =>
+        parseTime(a.start_time).getTime() - parseTime(b.start_time).getTime()
+    )[0];
+
+  let status = "Available";
+  let user = "-";
+  let startTime = openTime;
+  let endTime = closeTime;
+
+  if (active) {
+    status = active.check_in ? "Ongoing" : "Waiting Check-In";
+    user = active.user;
+    startTime = active.start_time.slice(0, 5);
+    endTime = active.end_time.slice(0, 5);
+  } else if (upcoming) {
+    status = "Upcoming";
+    user = upcoming.user;
+    startTime = upcoming.start_time.slice(0, 5);
+    endTime = upcoming.end_time.slice(0, 5);
+  }
+
+  return { courtNumber, status, user, startTime, endTime };
 }

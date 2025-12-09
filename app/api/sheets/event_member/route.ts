@@ -1,41 +1,46 @@
 import { NextResponse } from "next/server";
-import {
-  addEventMember,
-  getEventMember,
-} from "@/app/services/eventMember.service";
+import { APIResponse, } from "@/app/types/apiResponse";
+import { getEventMember, addEventMember } from "@/app/services/eventMember.service";
 
 export async function GET(req: Request) {
-  const url = new URL(req.url);
-  const email = url.searchParams.get("email") ?? "";
+  try {
+    const url = new URL(req.url);
+    const email = url.searchParams.get("email") ?? "";
 
-  const result = await getEventMember(email);
+    const result: APIResponse = await getEventMember(email);
 
-  if (!result.success) {
-    return NextResponse.json(
-      { error: result.message, data: result.data },
-      { status: result.status }
-    );
+    return NextResponse.json(result, { status: result.status });
+  } catch (err: any) {
+    console.error("GET /api/event-member error:", err);
+
+    const res:APIResponse = {
+      success: false,
+      status: 500,
+      message: err.message || "Internal Server Error",
+      data: null,
+    };
+
+    return NextResponse.json(res, { status: res.status });
   }
-
-  return NextResponse.json(
-    { data: result.data, message: result.message },
-    { status: 200 }
-  );
 }
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  const result = await addEventMember(body);
+  try {
+    const body = await req.json();
 
-  if (!result.success) {
-    return NextResponse.json(
-      { error: result.message, data: result.data },
-      { status: result.status }
-    );
+    const result: APIResponse = await addEventMember(body);
+
+    return NextResponse.json(result, { status: result.status });
+  } catch (err: any) {
+    console.error("POST /api/event-member error:", err);
+
+    const res: APIResponse = {
+      success: false,
+      status: 500,
+      message: err.message || "Internal Server Error",
+      data: null,
+    };
+
+    return NextResponse.json(res, { status: res.status });
   }
-
-  return NextResponse.json(
-    { data: result.data, message: result.message },
-    { status: result.status }
-  );
 }

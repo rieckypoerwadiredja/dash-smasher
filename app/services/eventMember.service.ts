@@ -1,11 +1,12 @@
 import { getSheetsClient } from "@/app/utils/sheets";
 import { EventMember } from "../(main)/events/page";
 import { formatDateTime } from "../utils/date";
+import { APIError, APIResponse } from "../types/apiResponse";
 
 const spreadsheetId = process.env.SPREADSHEET_ID!;
 
 // GET — find by email
-export async function getEventMember(email: string) {
+export async function getEventMember(email: string): Promise<APIResponse> {
   try {
     if (!email) {
       return {
@@ -54,7 +55,7 @@ export async function getEventMember(email: string) {
 }
 
 // POST — insert new row
-export async function addEventMember(body: EventMember) {
+export async function addEventMember(body: EventMember): Promise<APIResponse> {
   try {
     const { id, name, email, event_id } = body;
     const created_at = formatDateTime();

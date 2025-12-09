@@ -11,7 +11,7 @@ async function Page({
   // Get Court ID
   const { courtId } = await searchParams;
   if (!courtId) throw new Error("courtId is required");
-  console.log(courtId);
+
   const session = await protectedPage();
   if (!session.user) redirect("/login");
 

@@ -1,11 +1,13 @@
+import { APIError, APIResponse } from "../types/apiResponse";
 import { getSheetsClient } from "../utils/sheets";
 
 const spreadsheetId = process.env.SPREADSHEET_ID!;
 
-export async function getCourt(id: string) {
+export async function getCourt(id: string): Promise<APIResponse>  {
   try {
     if (!id) {
       return {
+        success: false,
         status: 400,
         message: "Missing id parameter",
         data: null,
@@ -20,11 +22,11 @@ export async function getCourt(id: string) {
       range,
     });
 
-    const rows = res.data.values || [];
+    const rows =  res.data.values || [];
     const [header, ...dataRows] = rows;
 
     // mapping hasil sheet ke object
-    const data = dataRows.map((row) => {
+    const data =  dataRows.map((row) => {
       const obj: Record<string, string> = {};
       header.forEach((key, i) => {
         obj[key] = row[i] || "";
@@ -37,6 +39,7 @@ export async function getCourt(id: string) {
 
     if (!found) {
       return {
+        success: false,
         status: 404,
         message: "No court data found, check your court id",
         data: null,
@@ -61,7 +64,7 @@ export async function getCourt(id: string) {
   }
 }
 
-export async function getCourts(adminEmail: string | undefined) {
+export async function getCourts(adminEmail: string | undefined): Promise<APIResponse> {
   try {
     const sheets = await getSheetsClient();
     const spreadsheetId = process.env.SPREADSHEET_ID!;

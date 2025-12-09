@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCourt } from "@/app/services/court.service";
+import { APIResponse } from "@/app/types/apiResponse";
 
 export async function GET(request: Request) {
   try {
@@ -7,27 +8,18 @@ export async function GET(request: Request) {
     const pathSegments = url.pathname.split("/");
     const id = pathSegments[pathSegments.length - 1];
 
-    const result = await getCourt(id);
+    const result:APIResponse = await getCourt(id);
 
-    //  error
-    if (!result.success) {
-      return NextResponse.json(
-        { message: result.message },
-        { status: result.status }
-      );
-    }
-
-    // Success
-    return NextResponse.json(
-      { success: true, data: result.data },
-      { status: 200 }
-    );
-  } catch (err) {
+    return NextResponse.json(result, { status: result.status });
+  } catch (err:any) {
     console.error("API /courts/[id] error:", err);
 
-    return NextResponse.json(
-      { message: "Failed to fetch court data" },
-      { status: 500 }
-    );
+    const res:APIResponse = {
+      success: false,
+      status: 500,
+      message: err.message || "Failed to fetch court data",
+      data: null,
+    };
+    return NextResponse.json(res, { status: res.status });
   }
 }

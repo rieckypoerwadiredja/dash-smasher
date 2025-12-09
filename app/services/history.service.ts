@@ -1,9 +1,13 @@
+import { Court } from "../(main)/courts/page";
+import { EventMember } from "../(main)/events/page";
+import { Book } from "../components/fragments/DetailCourtClientWrapper";
+import { APIError, APIResponse } from "../types/apiResponse";
 import { getBooks } from "./books.service";
 import { getCourt } from "./court.service";
 import { getEvent } from "./event.service";
 import { getEventMember } from "./eventMember.service";
 
-export async function getHistory(email?: string, limit?: string) {
+export async function getHistory(email?: string, limit?: string): Promise<APIResponse> {
   try {
     if (!email) {
       return {
@@ -33,10 +37,10 @@ export async function getHistory(email?: string, limit?: string) {
       }
     }
 
-    const myBook = await getBooks(email);
-    const myEvent = await getEventMember(email);
+    const myBook: APIResponse<Book[]> = await getBooks(email);
+    const myEvent: APIResponse<EventMember[]> = await getEventMember(email);
 
-    if (!myBook.data || !myEvent.data) {
+    if (!myBook.success || !myEvent.success || !myBook.data || !myEvent.data) {
       throw new Error("no have book and event data");
     }
 
@@ -47,7 +51,7 @@ export async function getHistory(email?: string, limit?: string) {
 
     const booksWithCourt = await Promise.all(
       limitedBooks.map(async (book) => {
-        const court = await getCourt(book.court_id);
+        const court: APIResponse<Court> = await getCourt(book.court_id);
 
         return {
           ...book,

@@ -1,29 +1,24 @@
 import { getCourts } from "@/app/services/court.service";
+import { APIResponse } from "@/app/types/apiResponse";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
     const adminEmail = url.searchParams.get("admin") ?? undefined;
-    const result = await getCourts(adminEmail);
+    const result:APIResponse = await getCourts(adminEmail);
 
-    if (!result.success) {
-      return NextResponse.json(
-        { success: false, message: result.message },
-        { status: result.status }
-      );
-    }
-
-    return NextResponse.json(
-      { success: true, data: result.data, message: result.message },
-      { status: 200 }
-    );
-  } catch (err) {
+    return NextResponse.json(result, { status: result.status });
+  } catch (err:any) {
     console.error("GET /courts error:", err);
 
-    return NextResponse.json(
-      { success: false, message: "Failed to fetch courts" },
-      { status: 500 }
-    );
+    const res:APIResponse = {
+      success: false,
+      status: 500,
+      message: err.message || "Failed to fetch courts",
+      data: null,
+    };
+
+    return NextResponse.json(res, { status: res.status });
   }
 }

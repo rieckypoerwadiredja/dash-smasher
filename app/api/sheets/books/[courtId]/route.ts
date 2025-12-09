@@ -1,4 +1,5 @@
 import { getBookByCourtId } from "@/app/services/books.service";
+import { APIError, APIResponse } from "@/app/types/apiResponse";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -11,31 +12,27 @@ export async function GET(request: Request) {
     const adminParams = url.searchParams.get("admins");
     const admins = adminParams ? adminParams.split(",") : undefined;
 
-    if (!id) {
-      return NextResponse.json(
-        { success: false, error: "Missing id parameter" },
-        { status: 400 }
-      );
-    }
-
     const paymentStatus = status
       ? status.split(",").map((s) => s.trim())
       : undefined;
 
-    const booking = await getBookByCourtId(
+    const booking: APIResponse = await getBookByCourtId(
       id,
       paymentStatus,
       paymentType,
       admins
     );
 
-    return NextResponse.json(booking);
+    return NextResponse.json(booking, { status: booking.status });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     console.error("GET /api/sheets/books/[id] error:", err);
-    return NextResponse.json(
-      { success: false, message: err.message, status: 500 },
-      { status: 500 }
-    );
+    const res: APIError = {
+      success: false,
+      message: err.message || "Internal Server Error",
+      status: 500,
+    };
+
+    return NextResponse.json(res, { status: res.status });
   }
 }

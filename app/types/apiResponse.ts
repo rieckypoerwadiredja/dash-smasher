@@ -5,3 +5,9 @@ export interface APIResponse<T = any> {
   message: string;
   data: T | null;
 }
+
+export interface APIError {
+  success: boolean;
+  status: number;
+  message: string;
+}

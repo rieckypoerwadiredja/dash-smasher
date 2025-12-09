@@ -1,6 +1,7 @@
-import DetailCourtClientWrapper from "@/app/components/fragments/DetailCourtClientWrapper";
+import { Court } from "@/app/(main)/courts/page";
+import DetailCourtClientWrapper, { Book } from "@/app/components/fragments/DetailCourtClientWrapper";
 import { IMAGES } from "@/app/constants/image";
-import { API_BASE_URL } from "@/app/utils/fetcher";
+import { API_BASE_URL, fetchData } from "@/app/utils/fetcher";
 
 import { Metadata } from "next";
 
@@ -14,6 +15,18 @@ export async function generateMetadata({
     cache: "no-store",
   }).then((r) => r.json());
 
+  if (!res.success || !res.data) {
+    // court not found, return default metadata
+    return {
+      title: "Court not found",
+      description: "The requested court does not exist",
+      icons: {
+        icon: IMAGES.logoIco,
+        shortcut: IMAGES.logo,
+        apple: IMAGES.logo,
+      },
+    };
+  }
   const court = res.data;
 
   return {
@@ -33,14 +46,17 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const courtRes = await fetch(`${API_BASE_URL}/api/sheets/courts/${id}`).then(
-    (r) => r.json()
-  );
-  const booksRes = await fetch(
-    `${API_BASE_URL}/api/sheets/books/${id}?paymentStatus=pending,settlement&paymentType=valid`
-  ).then((r) => r.json());
-  const court = courtRes.data;
-  const books = booksRes.data || [];
 
-  return <DetailCourtClientWrapper courtData={court} booksData={books} />;
+  const courtRes = await fetchData< Court >(
+    `${API_BASE_URL}/api/sheets/courts/${id}`
+  );
+  const booksRes = await fetchData< Book[] >(
+    `${API_BASE_URL}/api/sheets/books/${id}?paymentStatus=pending,settlement&paymentType=valid`
+  );
+  return (
+    <DetailCourtClientWrapper
+      courtData={courtRes}
+      booksData={booksRes || []}
+    />
+  );
 }

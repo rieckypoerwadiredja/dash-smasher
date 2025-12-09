@@ -9,7 +9,7 @@ import OccupancyHeatmap from "@/app/components/elements/metrics/chart/HeatMap";
 import { Court } from "@/app/(main)/courts/page";
 import { Book } from "@/app/components/fragments/DetailCourtClientWrapper";
 import {
-  mapBookingsToMetrics,
+  mapBookingsToMetricsOwner,
   mapBooksToAlerts,
   mapBooksToHeatmap,
   mapBooksToPieChart,
@@ -146,7 +146,7 @@ export default function OwnerDashboard({
     value: c.id,
   }));
 
-  const metrics = mapBookingsToMetrics(books);
+  const metrics = mapBookingsToMetricsOwner(books);
   const recentOrders = mapBooksToRecentOrders(books);
   const revenueChart = mapBooksToRevenueChart(books);
   const pieChart = mapBooksToPieChart(books);

@@ -1,36 +1,156 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dash Smasher 🏸
 
-## Getting Started
+A modern badminton court booking and management dashboard for admin and analytics. Dash Smasher simplifies the process of reserving courts, managing events, and handling payments for badminton facilities. Built for venue owners and players who need an intuitive platform to streamline bookings, check-ins, and event participation.
 
-First, run the development server:
+## ✨ Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Court Booking System** - Reserve courts with real-time availability status
+- **Event Management** - Create, browse, and join badminton events
+- **Online Payment Integration** - Secure payments via Midtrans gateway
+- **QR Code Check-in** - Scan QR codes for seamless check-in process
+- **Admin Dashboard** - Manage courts, events, bookings, and view analytics
+- **User Authentication** - Secure login with NextAuth
+- **Booking History** - Track past and upcoming reservations
+- **Responsive Design** - Optimized for mobile and desktop
+
+## 🛠️ Tech Stack
+
+| Technology | Version | Description |
+|------------|---------|-------------|
+| Next.js | 16.0.7 | React framework with App Router |
+| React | 19.2.0 | UI library |
+| TypeScript | 5.x | Type-safe JavaScript |
+| Tailwind CSS | 4.x | Utility-first CSS framework |
+| NextAuth | 4.24.13 | Authentication |
+| Google Sheets API | 164.1.0 | Database via googleapis |
+| Midtrans Client | 1.4.3 | Payment gateway |
+| ApexCharts | 5.3.6 | Data visualization |
+| React Icons | 5.5.0 | Icon library |
+
+## 📁 Project Structure
+
+```
+src/
+├── app/
+│   ├── api/
+│   │   ├── auth/              # NextAuth configuration
+│   │   ├── midtrans/          # Payment gateway endpoints
+│   │   └── sheets/            # Google Sheets API endpoints
+│   │       ├── books/         # Booking operations
+│   │       ├── courts/        # Court management
+│   │       ├── events/        # Event operations
+│   │       ├── event_member/  # Event membership
+│   │       ├── check_in/      # QR check-in system
+│   │       └── history/       # Booking history
+│   ├── (main)/                # Main app pages
+│   │   ├── courts/            # Courts listing
+│   │   └── events/            # Events listing
+│   ├── (fullscreen)/          # Fullscreen layouts
+│   │   ├── admin/             # Admin dashboard
+│   │   ├── login/             # Authentication
+│   │   ├── profile/           # User profile
+│   │   └── courts/            # Court details
+│   ├── components/
+│   │   ├── elements/          # Reusable UI elements
+│   │   └── fragments/         # Composite components
+│   ├── services/              # Business logic services
+│   ├── utils/                 # Utility functions
+│   ├── types/                 # TypeScript definitions
+│   ├── context/               # React context providers
+│   ├── hooks/                 # Custom React hooks
+│   └── constants/             # App constants
+└── public/                    # Static assets
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Clone the repository
+git clone https://github.com/rieckypoerwadiredja/dash-smasher
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Navigate to project directory
+cd dash-smasher
 
-## Learn More
+# Install dependencies
+npm install
 
-To learn more about Next.js, take a look at the following resources:
+# Run development server
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## ⚙️ Environment Variables
 
-## Deploy on Vercel
+Create a `.env.local` file in the root directory with the following variables:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```env
+# Google Sheets API (Google Workspace)
+SPREADSHEET_ID=
+GOOGLE_PROJECT_ID=
+GOOGLE_CLIENT_EMAIL=
+GOOGLE_PRIVATE_KEY=
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Google Auth (Google Workspace)
+GOOGLE_ID=
+GOOGLE_SECRET=
+
+# GitHub Auth (GitHub)
+GITHUB_ID=
+GITHUB_SECRET=
+
+# Midtrans Payment Gateway (Midtrans)
+MERCHANT_ID=
+NEXT_PUBLIC_MIDTRANS_CLIENT_KEY=
+MIDTRANS_SERVER_KEY=
+NEXT_PUBLIC_MIDTRANS_SNAP_URL=https://app.sandbox.midtrans.com/snap/snap.js
+
+
+# App Configuration (Next.js)
+NEXT_PUBLIC_API_URL=
+
+# NextAuth (Next.js)
+NEXTAUTH_SECRET=
+NEXTAUTH_URL=http://localhost:3000
+
+```
+
+## 📡 API Structure
+
+### Sheets API
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/sheets/courts` | Get all courts |
+| GET | `/api/sheets/courts/:id` | Get a specific court |
+| GET | `/api/sheets/books` | Get all bookings |
+| GET | `/api/sheets/books/:id` | Get a specific booking |
+| POST | `/api/sheets/books` | Create a booking |
+| GET | `/api/sheets/events` | Get all events |
+| GET | `/api/sheets/events/:id` | Get a specific event |
+| GET | `/api/sheets/event_member` | Get event members |
+| GET | `/api/sheets/event_member/:id` | Get a specific event member |
+| GET | `/api/sheets/history` | Get booking history |
+| POST | `/api/sheets/check_in` | Process check-in |
+
+### Payment API
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/midtrans` | Create payment transaction |
+
+### Auth API
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET/POST | `/api/auth/[...nextauth]` | NextAuth endpoints |
+
+## 🗺️ Roadmap
+
+- [ ] Add push notifications for booking reminders
+- [ ] Add push notifications for event reminders
+
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
