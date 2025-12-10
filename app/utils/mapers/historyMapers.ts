@@ -1,6 +1,13 @@
-import { History } from "@/app/(fullscreen)/profile/page";
+import {
+  History,
+  HistoryBook,
+  HistoryEvent,
+} from "@/app/(fullscreen)/profile/page";
 import { MainCardProps } from "@/app/components/elements/Card";
 import { generateQR } from "../generateQR";
+import { Book } from "@/app/components/fragments/DetailCourtClientWrapper";
+import { EventMember } from "@/app/(main)/events/page";
+import { Activity } from "@/app/components/fragments/RecentActivityList";
 
 const padTime = (t: string) =>
   t
@@ -147,4 +154,27 @@ export function mapEventToActivities(history: History): MainCardProps[] {
     name: e.name,
     desc: e.desc,
   }));
+}
+
+export function mapHistoryToActivities(
+  books: HistoryBook[] = [],
+  events: HistoryEvent[] = []
+): Activity[] {
+  const mappedBooks: Activity[] = books.map((b) => ({
+    image: b.image,
+    title: b.name,
+    desc: `${b.status}: ${b.start_time} - ${b.end_time} <br/> ${b.date}`,
+  }));
+
+  const mappedEvents: Activity[] = events.map((e) => ({
+    image: e.image,
+    title: e.name,
+    desc: "Registered",
+  }));
+
+  const merged = [...mappedBooks, ...mappedEvents];
+
+  // sort newest first
+
+  return merged;
 }

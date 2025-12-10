@@ -18,13 +18,11 @@ export async function GET(req: Request) {
         );
       }
     }
-    // TODO KSH KALSIFIKASI STATUS ACTIVE, BOOK HISTORY BOOK, HISTORY EVENT, PENDING BOOK, CHECKIN STATUS,
-    // BERDASARKAN START TIME, END TIME, TGL, PAYMENT STATUS
 
     return NextResponse.json(history, {
       status: history.status,
     });
-  } catch (error:any) {
+  } catch (error: any) {
     console.error(error);
     const errorResponse: APIResponse = {
       success: false,

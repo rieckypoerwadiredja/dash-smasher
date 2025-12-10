@@ -9,6 +9,8 @@ import { mapCourtToCardData } from "../utils/mapers/courtMapers";
 import { mapEventsToSliderData } from "../utils/mapers/eventMapers";
 import HomeClientWrapper from "../components/fragments/HomeClientWrapper";
 import { getServerSession } from "next-auth";
+import { mapHistoryToActivities } from "../utils/mapers/historyMapers";
+import { History } from "../(fullscreen)/profile/page";
 
 export const dynamic = "force-dynamic";
 
@@ -29,54 +31,15 @@ export default async function Home() {
     );
   }
 
-  // conoth data
-  const activities: Activity[] = [
-    {
-      image: "/events/event1.jpg",
-      title: "Badminton Training",
-      desc: "with Anton Suginto",
-    },
-    {
-      image: "/events/event2.jpg",
-      title: "Junior Match",
-      desc: "35 participants",
-    },
-    {
-      image: "/events/event3.jpg",
-      title: "Badminton Training",
-      desc: "with Doni, Budi Sugandi",
-    },
-    {
-      image: "/events/event1.jpg",
-      title: "Badminton Training",
-      desc: "with Anton Suginto",
-    },
-    {
-      image: "/events/event2.jpg",
-      title: "Junior Match",
-      desc: "35 participants",
-    },
-    {
-      image: "/events/event3.jpg",
-      title: "Badminton Training",
-      desc: "with Doni, Budi Sugandi",
-    },
-    {
-      image: "/events/event1.jpg",
-      title: "Badminton Training",
-      desc: "with Anton Suginto",
-    },
-    {
-      image: "/events/event2.jpg",
-      title: "Junior Match",
-      desc: "35 participants",
-    },
-    {
-      image: "/events/event3.jpg",
-      title: "Badminton Training",
-      desc: "with Doni, Budi Sugandi",
-    },
-  ];
+  let activities: Activity[] = [];
+
+  if (session?.user) {
+    const history = await fetchData<History>(
+      `${API_BASE_URL}/api/sheets/history?email=${session.user.email}&limit=6`
+    );
+    activities = mapHistoryToActivities(history.books, history.events);
+  }
+
   return (
     <>
       <HomeClientWrapper data={eventSliders} userEvents={userEvents} />

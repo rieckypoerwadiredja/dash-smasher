@@ -15,17 +15,17 @@ A modern badminton court booking and management dashboard for admin and analytic
 
 ## 🛠️ Tech Stack
 
-| Technology | Version | Description |
-|------------|---------|-------------|
-| Next.js | 16.0.7 | React framework with App Router |
-| React | 19.2.0 | UI library |
-| TypeScript | 5.x | Type-safe JavaScript |
-| Tailwind CSS | 4.x | Utility-first CSS framework |
-| NextAuth | 4.24.13 | Authentication |
-| Google Sheets API | 164.1.0 | Database via googleapis |
-| Midtrans Client | 1.4.3 | Payment gateway |
-| ApexCharts | 5.3.6 | Data visualization |
-| React Icons | 5.5.0 | Icon library |
+| Technology        | Version | Description                     |
+| ----------------- | ------- | ------------------------------- |
+| Next.js           | 16.0.7  | React framework with App Router |
+| React             | 19.2.0  | UI library                      |
+| TypeScript        | 5.x     | Type-safe JavaScript            |
+| Tailwind CSS      | 4.x     | Utility-first CSS framework     |
+| NextAuth          | 4.24.13 | Authentication                  |
+| Google Sheets API | 164.1.0 | Database via googleapis         |
+| Midtrans Client   | 1.4.3   | Payment gateway                 |
+| ApexCharts        | 5.3.6   | Data visualization              |
+| React Icons       | 5.5.0   | Icon library                    |
 
 ## 📁 Project Structure
 
@@ -119,37 +119,36 @@ NEXTAUTH_URL=http://localhost:3000
 
 ### Sheets API
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/sheets/courts` | Get all courts |
-| GET | `/api/sheets/courts/:id` | Get a specific court |
-| GET | `/api/sheets/books` | Get all bookings |
-| GET | `/api/sheets/books/:id` | Get a specific booking |
-| POST | `/api/sheets/books` | Create a booking |
-| GET | `/api/sheets/events` | Get all events |
-| GET | `/api/sheets/events/:id` | Get a specific event |
-| GET | `/api/sheets/event_member` | Get event members |
-| GET | `/api/sheets/event_member/:id` | Get a specific event member |
-| GET | `/api/sheets/history` | Get booking history |
-| POST | `/api/sheets/check_in` | Process check-in |
+| Method | Endpoint                     | Description              | Query Params                                                                                          |
+| ------ | ---------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------- |
+| GET    | `/api/sheets/courts`         | Get all courts           | `admin` (string)                                                                                      |
+| GET    | `/api/sheets/courts/:id`     | Get a specific court     | —                                                                                                     |
+| GET    | `/api/sheets/books`          | Get all bookings         | `email` (string), `courtIDs` (string, comma-separated)                                                |
+| GET    | `/api/sheets/books/:courtId` | Get bookings by court ID | `paymentStatus` (string, comma-separated), `paymentType` (string), `admins` (string, comma-separated) |
+| POST   | `/api/sheets/books`          | Create a booking         | —                                                                                                     |
+| PUT    | `/api/sheets/books`          | Update a booking         | —                                                                                                     |
+| GET    | `/api/sheets/events`         | Get all events           | —                                                                                                     |
+| GET    | `/api/sheets/event_member`   | Get event members        | `email` (string)                                                                                      |
+| POST   | `/api/sheets/event_member`   | Add event member         | —                                                                                                     |
+| GET    | `/api/sheets/history`        | Get booking history      | `email` (string), `limit` (string)                                                                    |
+| PUT    | `/api/sheets/check_in`       | Process check-in         | —                                                                                                     |
 
 ### Payment API
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/midtrans` | Create payment transaction |
+| Method | Endpoint        | Description                |
+| ------ | --------------- | -------------------------- |
+| POST   | `/api/midtrans` | Create payment transaction |
 
 ### Auth API
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
+| Method   | Endpoint                  | Description        |
+| -------- | ------------------------- | ------------------ |
 | GET/POST | `/api/auth/[...nextauth]` | NextAuth endpoints |
 
 ## 🗺️ Roadmap
 
 - [ ] Add push notifications for booking reminders
 - [ ] Add push notifications for event reminders
-
 
 ## 📄 License
 

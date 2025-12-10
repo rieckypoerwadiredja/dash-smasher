@@ -4,6 +4,8 @@ import Section from "./Section";
 import CardGrid from "./CardGrid";
 import Info, { InfoSkeleton } from "../elements/Info";
 import { IMAGES } from "@/app/constants/image";
+import Button from "../elements/Button";
+import Image from "next/image";
 
 export interface Activity {
   image?: string;
@@ -27,6 +29,22 @@ export default function RecentActivityList({
 
   return (
     <Section title="Recent Activity" className="w-full flex-col items-start">
+      {activities.length === 0 && (
+        <div className="flex items-center justify-center h-full w-full min-h-[200px]">
+          <Image
+            src={IMAGES.mainMascot}
+            alt="Main Mascot"
+            width={200}
+            height={100}
+          />
+          <div className="flex flex-col gap-y-5">
+            <h3 className="text-2xl font-bold">Let's make first booking!</h3>
+            <Button link="/courts" className="btn btn-primary text-center">
+              Book Now
+            </Button>
+          </div>
+        </div>
+      )}
       <CardGrid>
         {visibleActivities.map((activity, index) => (
           <Info

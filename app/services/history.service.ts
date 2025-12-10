@@ -7,7 +7,10 @@ import { getCourt } from "./court.service";
 import { getEvent } from "./event.service";
 import { getEventMember } from "./eventMember.service";
 
-export async function getHistory(email?: string, limit?: string): Promise<APIResponse> {
+export async function getHistory(
+  email?: string,
+  limit?: string
+): Promise<APIResponse> {
   try {
     if (!email) {
       return {
@@ -74,7 +77,6 @@ export async function getHistory(email?: string, limit?: string): Promise<APIRes
           ...myEvent,
           name: event.data?.name || "",
           image: event.data?.image || "",
-          desc: "Registered",
         };
       })
     );
