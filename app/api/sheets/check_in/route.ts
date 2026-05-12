@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { getBookById, updateBookById } from "@/app/services/books.service";
-import {  APIResponse } from "@/app/types/apiResponse";
+import { APIResponse } from "@/app/types/apiResponse";
 import { formatDateTime, formatToWIB } from "@/app/utils/date";
 import { NextResponse } from "next/server";
 
@@ -12,11 +12,11 @@ export async function PUT(request: Request) {
 
     if (!id) throw new Error("ID is required");
 
-    const booking:APIResponse = await getBookById(id);
-    if (!booking.success) throw new Error("Error fetching booking");
+    const booking: APIResponse = await getBookById(id);
+    if (!booking.success) throw new Error("Booking not found or invalid ID");
 
     const bookingData = booking.data;
-    if (!bookingData) throw new Error("Booking not found");
+    if (!bookingData) throw new Error("Booking not found or invalid ID");
 
     // INVALID PAYMENT OR STATUS
     const invalidStatus = ["-", "cancel", "deny", "expire", "pending"];
@@ -65,7 +65,9 @@ export async function PUT(request: Request) {
       throw new Error("This booking is already expired.");
 
     // TIME WINDOW VALIDATION
-    const [startHour, startMinute] = bookingData.start_time.split(":").map(Number);
+    const [startHour, startMinute] = bookingData.start_time
+      .split(":")
+      .map(Number);
     const [endHour, endMinute] = bookingData.end_time.split(":").map(Number);
 
     const startTime = new Date(bookDayWIB);
@@ -99,14 +101,13 @@ export async function PUT(request: Request) {
     const check_in_at = formatDateTime(); // already WIB
     const payload = { ...updateFields, check_in_at };
 
-    const result:APIResponse = await updateBookById(id, payload);
-
+    const result: APIResponse = await updateBookById(id, payload);
 
     return NextResponse.json(result, { status: result.status });
   } catch (error: any) {
     console.error("PUT /books error:", error);
 
-    const res:APIResponse  = {
+    const res: APIResponse = {
       success: false,
       status: 500,
       message: error.message || "Failed to update booking",

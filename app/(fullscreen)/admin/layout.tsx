@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <SessionWrapper>
-      <div className="px-5 md:px-10">{children}</div>
+      <div>{children}</div>
     </SessionWrapper>
   );
 }

@@ -5,7 +5,10 @@ import { getSheetsClient } from "../utils/sheets";
 
 const spreadsheetId = process.env.SPREADSHEET_ID!;
 
-export async function getBooks(email?: string, courtIDs?: Array<string>): Promise<APIResponse> {
+export async function getBooks(
+  email?: string,
+  courtIDs?: Array<string>,
+): Promise<APIResponse> {
   try {
     const sheets = await getSheetsClient();
 
@@ -75,11 +78,11 @@ export async function getBookByCourtId(
   id: string,
   paymentStatus: Array<string> | undefined,
   paymentType: "valid" | "not valid" | string | null,
-  admins?: Array<string>
+  admins?: Array<string>,
 ): Promise<APIResponse> {
   try {
-// validation id
-    if(!id){
+    // validation id
+    if (!id) {
       return {
         success: false,
         status: 400,
@@ -112,11 +115,11 @@ export async function getBookByCourtId(
       ) {
         return false;
       }
-      
+
       return true;
     });
 
-// Admin check
+    // Admin check
     if (admins) {
       const adminEmail = admins[0];
       const courtSheet = await sheets.spreadsheets.values.get({
@@ -193,20 +196,22 @@ export async function getBookById(id: string): Promise<APIResponse> {
     });
 
     const rows = response.data.values || [];
-    if (!rows.length) return{
-      success: false,
-      status: 200,
-      message: "No bookings found",
-      data: null,
-    }
+    if (!rows.length)
+      return {
+        success: false,
+        status: 200,
+        message: "No bookings found",
+        data: [],
+      };
 
     const row = rows.find((r) => r[0] === id); // kolom A = id
-    if (!row) return {
-      success: false,
-      status: 200,
-      message: "Booking not found",
-      data: null,
-    }
+    if (!row)
+      return {
+        success: false,
+        status: 200,
+        message: "Booking not found",
+        data: [],
+      };
 
     const book: Book = {
       id: row[0],
@@ -226,12 +231,12 @@ export async function getBookById(id: string): Promise<APIResponse> {
       check_in_at: row[14],
     };
     console.log(book);
-    return{
+    return {
       success: true,
       status: 200,
       message: "Booking fetched successfully",
       data: book,
-    }
+    };
   } catch (err: any) {
     console.error("getBookById error:", err);
     return {
@@ -243,7 +248,10 @@ export async function getBookById(id: string): Promise<APIResponse> {
   }
 }
 
-export async function updateBookById(id: string, newData: Partial<Book>): Promise<APIResponse> {
+export async function updateBookById(
+  id: string,
+  newData: Partial<Book>,
+): Promise<APIResponse> {
   try {
     const sheets = await getSheetsClient();
 
@@ -353,48 +361,48 @@ export async function updateBookById(id: string, newData: Partial<Book>): Promis
 
 export async function addBook(data: Book): Promise<APIResponse> {
   try {
-        const {
-          id,
-          court_id,
-          court_number,
-          user,
-          email,
-          start_time,
-          end_time,
-          date,
-          status,
-          total_price,
-          payment_type,
-          check_in,
-        } = data;
-        // validation
-        if (
-          !id ||
-          !court_id ||
-          !court_number ||
-          !user ||
-          !email ||
-          !start_time ||
-          !end_time ||
-          !date ||
-          !status ||
-          !total_price ||
-          !payment_type ||
-          check_in === undefined
-        ) {
-          return {
-            success: false,
-            message: "All fields are required",
-            status: 400,
-            data: null,
-          };
-        }
-
+    const {
+      id,
+      court_id,
+      court_number,
+      user,
+      email,
+      start_time,
+      end_time,
+      date,
+      status,
+      total_price,
+      payment_type,
+      check_in,
+    } = data;
+    // validation
+    if (
+      !id ||
+      !court_id ||
+      !court_number ||
+      !user ||
+      !email ||
+      !start_time ||
+      !end_time ||
+      !date ||
+      !status ||
+      !total_price ||
+      !payment_type ||
+      check_in === undefined
+    ) {
+      return {
+        success: false,
+        message: "All fields are required",
+        status: 400,
+        data: null,
+      };
+    }
+    console.log(data);
     const sheets = await getSheetsClient();
 
     const [day, month, year] = data.date.split("-").map(Number);
     const formattedDate = `${String(day).padStart(2, "0")}-${String(
-      month
+      month,
     ).padStart(2, "0")}-${year}`;
     const created_at = formatDateTime();
     const updated_at = "-";

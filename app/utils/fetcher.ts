@@ -10,7 +10,7 @@ export async function fetchData<T>(
     runtime?: boolean;
     method?: "GET" | "POST" | "PUT";
     body?: unknown;
-  }
+  },
 ): Promise<T> {
   const fetchOptions: RequestInit = {
     method: options?.method || "GET",
@@ -25,7 +25,6 @@ export async function fetchData<T>(
     fetchOptions.body = JSON.stringify(options.body);
   }
 
-
   if (!url.startsWith(API_BASE_URL)) {
     throw new Error("Invalid URL");
   }
@@ -34,26 +33,24 @@ export async function fetchData<T>(
     throw new Error("API_BASE_URL is not defined");
   }
 
-  
- const res = await fetch(url, fetchOptions);
+  const res = await fetch(url, fetchOptions);
 
   // parse JSON
   const json: APIResponse<T> = await res.json();
-console.log(json)
+  console.log(json);
   // handle error format from API
   if (!json.success) {
     throw new Error(json.message || "Request failed");
   }
 
   return json.data as T;
-
 }
 
 export async function handleJoin(
   eventId: string,
   session: Session | null,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  route: any
+  route: any,
 ) {
   if (!session || !session.user?.email || !session.user?.name) {
     route.push("/login");
@@ -70,7 +67,7 @@ export async function handleJoin(
   try {
     const data = await fetchData<{ message: string; data?: unknown }>(
       `${API_BASE_URL}/api/sheets/event_member`,
-      { method: "POST", body: payload }
+      { method: "POST", body: payload },
     );
     alert(data.message || "Successfully joined!");
     route.refresh();

@@ -40,8 +40,8 @@ export default function DetailCourtClientWrapper({
   courtData,
   booksData,
 }: {
-courtData: Court;
-booksData: Book[];
+  courtData: Court;
+  booksData: Book[];
 }) {
   const router = useRouter();
   const { data: session } = useSession();
@@ -65,7 +65,7 @@ booksData: Book[];
 
     return Array.from(
       { length: endDay - startDay + 1 },
-      (_, i) => i + startDay
+      (_, i) => i + startDay,
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentMonth, currentYear]);
@@ -119,7 +119,7 @@ booksData: Book[];
     }));
 
     const validBooks = formattedBooks.filter(
-      (book: Book) => book.status !== "-" && book.payment_type !== "-"
+      (book: Book) => book.status !== "-" && book.payment_type !== "-",
     );
 
     setBooks(validBooks || []);
@@ -351,7 +351,7 @@ booksData: Book[];
       // console.log(data);
       if (!res.ok) {
         throw new Error(
-          data.message || "Failed to make a booking. Please try again."
+          data.message || "Failed to make a booking. Please try again.",
         );
       }
 
@@ -364,7 +364,7 @@ booksData: Book[];
             "Content-Type": "application/json",
           },
           body: JSON.stringify(bookingData),
-        }
+        },
       );
 
       const midtransData = await midtransToken.json();
@@ -508,7 +508,7 @@ booksData: Book[];
                       (_, i) => ({
                         label: `Court ${i + 1}`,
                         value: (i + 1).toString(),
-                      })
+                      }),
                     )}
                   />
                 </div>
