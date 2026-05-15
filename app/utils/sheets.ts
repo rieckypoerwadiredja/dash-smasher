@@ -1,11 +1,10 @@
 import { google } from "googleapis";
-import credentials from "@/credentials/secret_2.json";
 
 export async function getSheetsClient() {
   const auth = new google.auth.GoogleAuth({
     credentials: {
-      client_email: credentials.client_email,
-      private_key: credentials.private_key,
+      client_email: process.env.GOOGLE_CLIENT_EMAIL,
+      private_key: process.env.GOOGLE_PRIVATE_KEY,
     },
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
   });
